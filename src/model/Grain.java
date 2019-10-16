@@ -7,11 +7,13 @@ public class Grain {
     private int state;
     private int nextState;
     private Color color;
+    private boolean onBorder;
 
     public Grain() {
         state = nextState = 0;
         id = -1;
         color = null;
+        onBorder = false;
     }
 
     public int getId() {
@@ -44,5 +46,13 @@ public class Grain {
 
     public void setColor(Color color) {
         this.color = color;
+    }
+
+    public boolean isOnBorder() {
+        return onBorder;
+    }
+
+    public void setOnBorder(boolean onBorder) {
+        this.onBorder = onBorder;
     }
 }

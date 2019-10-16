@@ -1,20 +1,17 @@
 package model;
 
 import javafx.scene.paint.Color;
-import javafx.stage.FileChooser;
 
+import javax.imageio.ImageIO;
 import java.util.*;
-import java.awt.*;
 import java.awt.image.*;
-import java.awt.MediaTracker.*;
-import java.io.FileNotFoundException;
 import java.io.*;
-import java.util.*;
 import java.util.List;
 
 public class Growth {
-    private Grain[][] grains;
+    public Grain[][] grains;
     private int gridWidth;
+
     private int gridHeight;
 
     private int indUp;
@@ -48,10 +45,7 @@ public class Growth {
                 grains[i][j] = new Grain();
             }
         }
-
-
     }
-
 
     public void randColorForEveryId(int numberOfGrains) {
         Random random = new Random();
@@ -86,121 +80,89 @@ public class Growth {
         }
     }
 
-    public void startGrowth() {
-
-    }
-
-    public void printGrid() {
-        for (int i = 0; i < gridWidth; i++) {
-            for (int j = 0; j < gridHeight; j++) {
-                if (grains[i][j].getState() == 1) {
-                    System.out.print("*");
-                }
-                System.out.println();
-            }
-        }
-    }
-
     public boolean checkLeftUpperNeigbour(int indUp, int indLeft) {
-        if (!(indUp == -1) && !(indLeft == -1)) {
             if (grains[indUp][indLeft].getState() == 1) {
                 id = grains[indUp][indLeft].getId();
                 fillMap(id, grainMap);
                 colorMap.put(id, grains[indUp][indLeft].getColor());
                 return true;
             }
-        }
         return false;
     }
 
     public boolean checkMiddleUpperNeigbour(int indUp, int j) {
-        if (!(indUp == -1)) {
-            if (grains[indUp][j].getState() == 1) {
-                id = grains[indUp][j].getId();
-                fillMap(id, grainMap);
-                colorMap.put(id, grains[indUp][j].getColor());
-                return true;
-            }
+        if (grains[indUp][j].getState() == 1) {
+            id = grains[indUp][j].getId();
+            fillMap(id, grainMap);
+            colorMap.put(id, grains[indUp][j].getColor());
+            return true;
         }
         return false;
     }
 
     public boolean checkRightUpperNeigbour(int indUp, int indRight) {
-        if (!(indUp == -1) && !(indRight == -1)) {
-            if (grains[indUp][indRight].getState() == 1) {
-                id = grains[indUp][indRight].getId();
-                fillMap(id, grainMap);
-                colorMap.put(id, grains[indUp][indRight].getColor());
-                return true;
-            }
+        if (grains[indUp][indRight].getState() == 1) {
+            id = grains[indUp][indRight].getId();
+            fillMap(id, grainMap);
+            colorMap.put(id, grains[indUp][indRight].getColor());
+            return true;
         }
         return false;
     }
 
     public boolean checkLeftNeigbour(int i, int indLeft) {
-        if (!(indLeft == -1)) {
-            if (grains[i][indLeft].getState() == 1) {
-                id = grains[i][indLeft].getId();
-                fillMap(id, grainMap);
-                colorMap.put(id, grains[i][indLeft].getColor());
-                return true;
-            }
+        if (grains[i][indLeft].getState() == 1) {
+            id = grains[i][indLeft].getId();
+            fillMap(id, grainMap);
+            colorMap.put(id, grains[i][indLeft].getColor());
+            return true;
         }
         return false;
     }
 
     public boolean checkRightNeigbour(int i, int indRight) {
-        if (!(indRight == -1)) {
-            if (grains[i][indRight].getState() == 1) {
-                id = grains[i][indRight].getId();
-                fillMap(id, grainMap);
-                colorMap.put(id, grains[i][indRight].getColor());
-                return true;
-            }
+        if (grains[i][indRight].getState() == 1) {
+            id = grains[i][indRight].getId();
+            fillMap(id, grainMap);
+            colorMap.put(id, grains[i][indRight].getColor());
+            return true;
         }
         return false;
     }
 
     public boolean checkLeftBottomNeigbour(int indDown, int indLeft) {
-        if (!(indDown == -1) && !(indLeft == -1)) {
-            if (grains[indDown][indLeft].getState() == 1) {
-                id = grains[indDown][indLeft].getId();
-                fillMap(id, grainMap);
-                colorMap.put(id, grains[indDown][indLeft].getColor());
-                return true;
-            }
+        if (grains[indDown][indLeft].getState() == 1) {
+            id = grains[indDown][indLeft].getId();
+            fillMap(id, grainMap);
+            colorMap.put(id, grains[indDown][indLeft].getColor());
+            return true;
         }
         return false;
     }
 
     public boolean checkMiddleBottomNeigbour(int indDown, int j) {
-        if (!(indDown == -1)) {
-            if (grains[indDown][j].getState() == 1) {
-                id = grains[indDown][j].getId();
-                fillMap(id, grainMap);
-                colorMap.put(id, grains[indDown][j].getColor());
-                return true;
-            }
+        if (grains[indDown][j].getState() == 1) {
+            id = grains[indDown][j].getId();
+            fillMap(id, grainMap);
+            colorMap.put(id, grains[indDown][j].getColor());
+            return true;
         }
         return false;
 
     }
 
     public boolean checkRightBottomNeigbour(int indDown, int indRight) {
-        if (!(indRight == -1) && !(indDown == -1)) {
-            if (grains[indDown][indRight].getState() == 1) {
-                id = grains[indDown][indRight].getId();
-                fillMap(id, grainMap);
-                colorMap.put(id, grains[indDown][indRight].getColor());
-                return true;
-            }
+        if (grains[indDown][indRight].getState() == 1) {
+            id = grains[indDown][indRight].getId();
+            fillMap(id, grainMap);
+            colorMap.put(id, grains[indDown][indRight].getColor());
+            return true;
         }
         return false;
     }
 
     public void moore() {
         int numberOfGrainNeigbours;
-
 
         do {
             isArrayFull = false;
@@ -246,6 +208,7 @@ public class Growth {
                             numberOfGrainNeigbours++;
                         }
 
+
                         if (numberOfGrainNeigbours > 0) {
                             idToAssign = getIDMaxNeighbour(grainMap);
                             grains[i][j].setNextState(1);
@@ -261,6 +224,51 @@ public class Growth {
         } while (isArrayFull);
     }
 
+    public void setBoundaries() {
+        for (int i = 0; i < gridWidth; i++) {
+            for (int j = 0; j < gridHeight; j++) {
+                Set<Integer> tempIds = new HashSet<>();
+                setEdge(i, j);
+
+                if (grains[indUp][indLeft].getState() == 1) {
+                    tempIds.add(grains[indUp][indLeft].getId());
+                }
+
+                if (grains[indUp][j].getState() == 1) {
+                    tempIds.add(grains[indUp][j].getId());
+                }
+
+                if (grains[indUp][indRight].getState() == 1) {
+                    tempIds.add(grains[indUp][indRight].getId());
+                }
+
+                if (grains[i][indLeft].getState() == 1) {
+                    tempIds.add(grains[i][indLeft].getId());
+                }
+
+                if (grains[i][indRight].getState() == 1) {
+                    tempIds.add(grains[i][indRight].getId());
+                }
+
+                if (grains[indDown][indLeft].getState() == 1) {
+                    tempIds.add(grains[indDown][indLeft].getId());
+                }
+
+                if (grains[indDown][j].getState() == 1) {
+                    tempIds.add(grains[indDown][j].getId());
+                }
+
+                if (grains[indDown][indRight].getState() == 1) {
+                    tempIds.add(grains[indDown][indRight].getId());
+                }
+
+                if (tempIds.size() > 1) {
+                    grains[i][j].setOnBorder(true);
+                }
+
+            }
+        }
+    }
 
     public void setEdge(int i, int j) {
         isNeig = false;
@@ -334,6 +342,114 @@ public class Growth {
         }
     }
 
+    public void saveToTxt() {
+        try {
+            FileWriter fileReader = new FileWriter("Structure.txt");
+            BufferedWriter bufferWritter = new BufferedWriter(fileReader);
+            PrintWriter printWriter = new PrintWriter(bufferWritter);
+            printWriter.write(gridWidth + " " + gridHeight);
+            printWriter.write("\n");
+            for (int i = 0; i < gridWidth; i++) {
+                for (int j = 0; j < gridHeight; j++) {
+                    if (grains[i] != null) {
+                        printWriter.write(
+                                i +
+                                        " " + j +
+                                        " " + grains[i][j].getState() +
+                                        " " + grains[i][j].getId() +
+                                        " " + grains[i][j].getColor().getRed() +
+                                        " " + grains[i][j].getColor().getGreen() +
+                                        " " + grains[i][j].getColor().getBlue());
+                        printWriter.write("\n");
+                    }
+                }
+            }
+            printWriter.close();
+        } catch (IOException e) {
+            System.out.println(e);
+        }
+    }
+
+    public void loadFromBMP() {
+        BufferedImage img = null;
+
+        try {
+            img = ImageIO.read(new File("C:\\Users\\Kamil\\Desktop\\Multiscale\\img.bmp"));
+        } catch (IOException e) {
+            System.out.println(e);
+        }
+
+        createGrid(img.getWidth(), img.getHeight());
+        System.out.println(gridWidth + " " + gridHeight);
+
+        Map<Integer, Color> loadedColors = new HashMap<>();
+
+        int index = 0;
+        for (int i = 0; i < gridWidth; i++) {
+            for (int j = 0; j < gridHeight; j++) {
+                int p = img.getRGB(i, j);
+
+                //get alpha
+                int a = (p >> 24) & 0xff;
+
+                //get red
+                int r = (p >> 16) & 0xff;
+
+                //get green
+                int g = (p >> 8) & 0xff;
+
+                //get blue
+                int b = p & 0xff;
+
+                Color newColor = Color.rgb(r, g, b);
+
+                if (!loadedColors.containsValue(newColor)) {
+                    loadedColors.put(index, newColor);
+                    index++;
+                }
+
+
+                Grain grain = grains[i][j];
+
+                grain.setState(1);
+                grain.setColor(newColor);
+
+                for (Map.Entry<Integer, Color> entry : loadedColors.entrySet()) {
+                    if (Objects.equals(newColor, entry.getValue())) {
+                        grain.setId(entry.getKey());
+                    }
+                }
+
+            }
+        }
+    }
+
+    public void loadFromTextFile() {
+        try (Scanner scanner = new Scanner(new FileInputStream("Structure.txt"));) {
+            String[] sizes = scanner.nextLine().split(" ");
+
+            createGrid(Integer.parseInt(sizes[0]), Integer.parseInt(sizes[0]));
+
+            String[] grainDetails;
+            while (scanner.hasNextLine()) {
+                grainDetails = scanner.nextLine().split((" "));
+                int x = Integer.parseInt(grainDetails[0]);
+                int y = Integer.parseInt(grainDetails[1]);
+                int state = Integer.parseInt(grainDetails[2]);
+                int id = Integer.parseInt(grainDetails[3]);
+                double red = Double.parseDouble(grainDetails[4]);
+                double green = Double.parseDouble(grainDetails[5]);
+                double blue = Double.parseDouble(grainDetails[6]);
+
+                grains[x][y].setState(state);
+                grains[x][y].setId(id);
+                grains[x][y].setColor(Color.color(red, green, blue));
+            }
+        } catch (IOException e) {
+            System.out.println("File not found");
+        }
+    }
+
     public Grain getGrain(int i, int j) {
         return grains[i][j];
     }
@@ -349,32 +465,6 @@ public class Growth {
     public int getGrainState(int i, int j) {
         return grains[i][j].getState();
     }
-
-    public void saveStructure() throws FileNotFoundException {
-        saveToTxt();
-
-    }
-
-    public void saveToTxt() {
-        try {
-            FileWriter fileReader = new FileWriter("Structure.txt");
-            BufferedWriter bufferWritter = new BufferedWriter(fileReader);
-            PrintWriter printWriter = new PrintWriter(bufferWritter);
-            printWriter.write(gridWidth + " " + gridHeight);
-            printWriter.write("\n");
-            for (int i = 0; i < gridWidth; i++) {
-                for (int j = 0; j < gridHeight; j++) {
-                    if (grains[i] != null) {
-                        printWriter.write(i + " " + j + " " + grains[i][j].getState() + " " + grains[i][j].getId());
-                        printWriter.write("\n");
-                    }
-                }
-            }
-            printWriter.close();
-        } catch (IOException e) {
-            System.out.println(e);
-        }
-    }
-
-
 }
+
+
