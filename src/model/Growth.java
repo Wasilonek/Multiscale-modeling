@@ -1,6 +1,7 @@
 package model;
 
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 
 import javax.imageio.ImageIO;
 import java.util.*;
@@ -19,7 +20,7 @@ public class Growth {
     private int indLeft;
     private int indRight;
 
-    private boolean isArrayFull = true;
+    private boolean isArrayFull = false;
     private int id = 0;
     private int idToAssign = 0;
 
@@ -60,7 +61,7 @@ public class Growth {
         int x, y;
         int maxAttemptToRandomGrains = 0;
 
-        clearArray();
+//        clearArray();
 
         for (int i = 0; i < numberOfGrains; ) {
 
@@ -81,7 +82,7 @@ public class Growth {
     }
 
     public boolean checkLeftUpperNeigbour(int indUp, int indLeft) {
-            if (grains[indUp][indLeft].getState() == 1) {
+            if (grains[indUp][indLeft].getState() == 1 && grains[indUp][indLeft].isInclusion() == false) {
                 id = grains[indUp][indLeft].getId();
                 fillMap(id, grainMap);
                 colorMap.put(id, grains[indUp][indLeft].getColor());
@@ -91,7 +92,7 @@ public class Growth {
     }
 
     public boolean checkMiddleUpperNeigbour(int indUp, int j) {
-        if (grains[indUp][j].getState() == 1) {
+        if (grains[indUp][j].getState() == 1 && grains[indUp][j].isInclusion() == false) {
             id = grains[indUp][j].getId();
             fillMap(id, grainMap);
             colorMap.put(id, grains[indUp][j].getColor());
@@ -101,7 +102,7 @@ public class Growth {
     }
 
     public boolean checkRightUpperNeigbour(int indUp, int indRight) {
-        if (grains[indUp][indRight].getState() == 1) {
+        if (grains[indUp][indRight].getState() == 1 && grains[indUp][indRight].isInclusion() == false) {
             id = grains[indUp][indRight].getId();
             fillMap(id, grainMap);
             colorMap.put(id, grains[indUp][indRight].getColor());
@@ -111,7 +112,7 @@ public class Growth {
     }
 
     public boolean checkLeftNeigbour(int i, int indLeft) {
-        if (grains[i][indLeft].getState() == 1) {
+        if (grains[i][indLeft].getState() == 1 && grains[i][indLeft].isInclusion() == false) {
             id = grains[i][indLeft].getId();
             fillMap(id, grainMap);
             colorMap.put(id, grains[i][indLeft].getColor());
@@ -121,7 +122,7 @@ public class Growth {
     }
 
     public boolean checkRightNeigbour(int i, int indRight) {
-        if (grains[i][indRight].getState() == 1) {
+        if (grains[i][indRight].getState() == 1 && grains[i][indRight].isInclusion() == false) {
             id = grains[i][indRight].getId();
             fillMap(id, grainMap);
             colorMap.put(id, grains[i][indRight].getColor());
@@ -131,7 +132,7 @@ public class Growth {
     }
 
     public boolean checkLeftBottomNeigbour(int indDown, int indLeft) {
-        if (grains[indDown][indLeft].getState() == 1) {
+        if (grains[indDown][indLeft].getState() == 1 && grains[indDown][indLeft].isInclusion() == false) {
             id = grains[indDown][indLeft].getId();
             fillMap(id, grainMap);
             colorMap.put(id, grains[indDown][indLeft].getColor());
@@ -140,8 +141,8 @@ public class Growth {
         return false;
     }
 
-    public boolean checkMiddleBottomNeigbour(int indDown, int j) {
-        if (grains[indDown][j].getState() == 1) {
+    public boolean checkMiddleBottomNeigbour(int indDown, int j ) {
+        if (grains[indDown][j].getState() == 1 && grains[indDown][j].isInclusion() == false) {
             id = grains[indDown][j].getId();
             fillMap(id, grainMap);
             colorMap.put(id, grains[indDown][j].getColor());
@@ -152,7 +153,7 @@ public class Growth {
     }
 
     public boolean checkRightBottomNeigbour(int indDown, int indRight) {
-        if (grains[indDown][indRight].getState() == 1) {
+        if (grains[indDown][indRight].getState() == 1 && grains[indDown][indRight].isInclusion() == false) {
             id = grains[indDown][indRight].getId();
             fillMap(id, grainMap);
             colorMap.put(id, grains[indDown][indRight].getColor());
@@ -171,7 +172,7 @@ public class Growth {
                     grainMap.clear();
                     colorMap.clear();
                     numberOfGrainNeigbours = 0;
-                    if (grains[i][j].getState() == 0) {
+                    if (grains[i][j].getState() == 0 && grains[i][j].isInclusion() == false) {
                         isArrayFull = true;
                         setEdge(i, j);
 
@@ -214,6 +215,7 @@ public class Growth {
                             grains[i][j].setNextState(1);
                             grains[i][j].setColor(colorMap.get(idToAssign));
                             grains[i][j].setId(idToAssign);
+                            grains[i][j].setInclusion(false);
                         }
                     }
                 }
@@ -222,6 +224,7 @@ public class Growth {
 
             copyArray();
         } while (isArrayFull);
+        isArrayFull = true;
     }
 
     public void setBoundaries() {
@@ -265,7 +268,10 @@ public class Growth {
                 if (tempIds.size() > 1) {
                     grains[i][j].setOnBorder(true);
                 }
-
+//                System.out.print(grains[i][j].getColor().getRed());
+//                System.out.print(grains[i][j].getColor().getGreen());
+//                System.out.print(grains[i][j].getColor().getBlue());
+//                System.out.println();
             }
         }
     }
@@ -338,13 +344,19 @@ public class Growth {
                 grains[i][j].setNextState(0);
                 grains[i][j].setColor(Color.WHITE);
                 grains[i][j].setId(-1);
+                grains[i][j].setOnBorder(false);
+                grains[i][j].setInclusion(false);
             }
         }
+        isArrayFull = false;
     }
 
-    public void saveToTxt() {
+    public void saveToTxt(File filePath) {
+
+
+        System.out.println(filePath);
         try {
-            FileWriter fileReader = new FileWriter("Structure.txt");
+            FileWriter fileReader = new FileWriter(new File(String.valueOf(filePath)));
             BufferedWriter bufferWritter = new BufferedWriter(fileReader);
             PrintWriter printWriter = new PrintWriter(bufferWritter);
             printWriter.write(gridWidth + " " + gridHeight);
@@ -465,6 +477,11 @@ public class Growth {
     public int getGrainState(int i, int j) {
         return grains[i][j].getState();
     }
+
+    public boolean isArrayFull() {
+        return isArrayFull;
+    }
+
 }
 
 

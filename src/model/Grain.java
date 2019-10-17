@@ -8,12 +8,14 @@ public class Grain {
     private int nextState;
     private Color color;
     private boolean onBorder;
+    private boolean isInclusion;
 
     public Grain() {
         state = nextState = 0;
         id = -1;
         color = null;
         onBorder = false;
+        isInclusion = false;
     }
 
     public int getId() {
@@ -54,5 +56,13 @@ public class Grain {
 
     public void setOnBorder(boolean onBorder) {
         this.onBorder = onBorder;
+    }
+
+    public boolean isInclusion() {
+        return isInclusion;
+    }
+
+    public void setInclusion(boolean inclusion) {
+        isInclusion = inclusion;
     }
 }
