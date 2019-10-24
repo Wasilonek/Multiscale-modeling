@@ -26,6 +26,7 @@ public class Growth {
 
     private boolean isNeig;
 
+    Random random;
 
     private Map<Integer, Color> colorMap, colorForEveryId;
     private Map<Integer, Integer> grainMap;
@@ -34,6 +35,7 @@ public class Growth {
     public Growth() {
         colorMap = colorForEveryId = new HashMap<>();
         grainMap = new HashMap<>();
+        random = new Random();
     }
 
     public void createGrid(int canvasWidth, int canvasHeight) {
@@ -227,6 +229,233 @@ public class Growth {
         isArrayFull = true;
     }
 
+    public void furtherMoore(int probability) {
+        do {
+            isArrayFull = false;
+            for (int i = 0; i < gridWidth; i++) {
+                for (int j = 0; j < gridHeight; j++) {
+                    if (grains[i][j].getState() == 0 && grains[i][j].isInclusion() == false){
+                        setEdge(i, j);
+                        isArrayFull = true;
+                        if(firstRule(i,j)){
+                        } else if(secondRule(i,j)) {
+                        } else if(thirdRule(i,j)) {
+                        } else if(fourthRule(i,j,probability)){
+                        }
+                    }
+
+                }
+            }
+            copyArray();
+        } while (isArrayFull);
+        isArrayFull = true;
+    }
+
+    private boolean firstRule(int i, int j) {
+        grainMap.clear();
+        colorMap.clear();
+        int numberOfGrainNeigbours = 0;
+
+            if (checkLeftUpperNeigbour(indUp, indLeft)) {
+                numberOfGrainNeigbours++;
+            }
+
+            if (checkMiddleUpperNeigbour(indUp, j)) {
+                numberOfGrainNeigbours++;
+            }
+
+            if (checkRightUpperNeigbour(indUp, indRight)) {
+                numberOfGrainNeigbours++;
+            }
+
+            if (checkLeftNeigbour(i, indLeft)) {
+                numberOfGrainNeigbours++;
+            }
+
+            if (checkRightNeigbour(i, indRight)) {
+                numberOfGrainNeigbours++;
+            }
+
+            if (checkLeftBottomNeigbour(indDown, indLeft)) {
+                numberOfGrainNeigbours++;
+            }
+
+            if (checkMiddleBottomNeigbour(indDown, j)) {
+                numberOfGrainNeigbours++;
+            }
+
+            if (checkRightBottomNeigbour(indDown, indRight)) {
+                numberOfGrainNeigbours++;
+            }
+
+            if (numberOfGrainNeigbours > 0) {
+                idToAssign = getIDMaxNeighbour(grainMap);
+                if(grainMap.get(id) >= 5) {
+                    grains[i][j].setNextState(1);
+                    grains[i][j].setColor(colorMap.get(idToAssign));
+                    grains[i][j].setId(idToAssign);
+                    grains[i][j].setInclusion(false);
+                    return true;
+                }
+            }
+        return false;
+    }
+
+    private boolean secondRule(int i, int j){
+        grainMap.clear();
+        colorMap.clear();
+        int numberOfGrainNeigbours = 0;
+            if (checkMiddleUpperNeigbour(indUp, j)) {
+                numberOfGrainNeigbours++;
+            }
+
+            if (checkLeftNeigbour(i, indLeft)) {
+                numberOfGrainNeigbours++;
+            }
+
+            if (checkRightNeigbour(i, indRight)) {
+                numberOfGrainNeigbours++;
+            }
+
+            if (checkMiddleBottomNeigbour(indDown, j)) {
+                numberOfGrainNeigbours++;
+            }
+
+            if (numberOfGrainNeigbours > 0) {
+                idToAssign = getIDMaxNeighbour(grainMap);
+                if(grainMap.get(id) >= 3) {
+                    grains[i][j].setNextState(1);
+                    grains[i][j].setColor(colorMap.get(idToAssign));
+                    grains[i][j].setId(idToAssign);
+                    grains[i][j].setInclusion(false);
+                    return true;
+                }
+            }
+        return false;
+    }
+
+    private boolean thirdRule(int i,int j) {
+        grainMap.clear();
+        colorMap.clear();
+        int numberOfGrainNeigbours = 0;
+
+            if (checkLeftUpperNeigbour(indUp, indLeft)) {
+                numberOfGrainNeigbours++;
+            }
+
+            if (checkRightUpperNeigbour(indUp, indRight)) {
+                numberOfGrainNeigbours++;
+            }
+
+            if (checkLeftBottomNeigbour(indDown, indLeft)) {
+                numberOfGrainNeigbours++;
+            }
+
+            if (checkRightBottomNeigbour(indDown, indRight)) {
+                numberOfGrainNeigbours++;
+            }
+
+            if (numberOfGrainNeigbours > 0) {
+                idToAssign = getIDMaxNeighbour(grainMap);
+                if(grainMap.get(id) >= 3) {
+                    grains[i][j].setNextState(1);
+                    grains[i][j].setColor(colorMap.get(idToAssign));
+                    grains[i][j].setId(idToAssign);
+                    grains[i][j].setInclusion(false);
+                    return true;
+                }
+            }
+        return false;
+    }
+
+    private boolean fourthRule(int i, int j, int probability) {
+        grainMap.clear();
+        colorMap.clear();
+        int numberOfGrainNeigbours = 0;
+
+            if (checkLeftUpperNeigbour(indUp, indLeft)) {
+                numberOfGrainNeigbours++;
+            }
+
+            if (checkMiddleUpperNeigbour(indUp, j)) {
+                numberOfGrainNeigbours++;
+            }
+
+            if (checkRightUpperNeigbour(indUp, indRight)) {
+                numberOfGrainNeigbours++;
+            }
+
+            if (checkLeftNeigbour(i, indLeft)) {
+                numberOfGrainNeigbours++;
+            }
+
+            if (checkRightNeigbour(i, indRight)) {
+                numberOfGrainNeigbours++;
+            }
+
+            if (checkLeftBottomNeigbour(indDown, indLeft)) {
+                numberOfGrainNeigbours++;
+            }
+
+            if (checkMiddleBottomNeigbour(indDown, j)) {
+                numberOfGrainNeigbours++;
+            }
+
+            if (checkRightBottomNeigbour(indDown, indRight)) {
+                numberOfGrainNeigbours++;
+            }
+
+            if (numberOfGrainNeigbours > 0) {
+                int randomNumber = random.nextInt(100) + 1;
+                if(randomNumber <= probability) {
+                    idToAssign = getIDMaxNeighbour(grainMap);
+                    setGrain(i,j,idToAssign);
+                    return false;
+                }
+
+            }
+        return false;
+    }
+
+    private void setGrain(int i, int j, int idToAssign) {
+        grains[i][j].setNextState(1);
+        grains[i][j].setColor(colorMap.get(idToAssign));
+        grains[i][j].setId(idToAssign);
+        grains[i][j].setInclusion(false);
+    }
+
+    private void fillMap(int id, Map<Integer, Integer> grainMap) {
+        if (grainMap.containsKey(id)) {
+            grainMap.put(id, grainMap.get(id) + 1);
+        } else {
+            grainMap.put(id, 1);
+        }
+    }
+
+    private int getIDMaxNeighbour(Map<Integer, Integer> grainMap) {
+        Map.Entry<Integer, Integer> maxEntry = null;
+
+        for (Map.Entry<Integer, Integer> entry : grainMap.entrySet())
+            if (maxEntry == null || entry.getValue().compareTo(maxEntry.getValue()) > 0)
+                maxEntry = entry;
+
+        int id = 0;
+        if (maxEntry != null) {
+            int max = maxEntry.getValue();
+
+            List<Integer> listMax = new ArrayList<>();
+            for (Map.Entry<Integer, Integer> entry : grainMap.entrySet())
+                if (entry.getValue() == max)
+                    listMax.add(entry.getKey());
+
+            Random rand = new Random();
+            int randWinner = rand.nextInt(listMax.size());
+            id = listMax.get(randWinner);
+        }
+
+        return id;
+    }
+
     public void setBoundaries() {
         for (int i = 0; i < gridWidth; i++) {
             for (int j = 0; j < gridHeight; j++) {
@@ -293,38 +522,6 @@ public class Growth {
         if (j == (gridHeight - 1))
             indRight = 0;
 
-    }
-
-    private void fillMap(int id, Map<Integer, Integer> grainMap) {
-        if (grainMap.containsKey(id)) {
-            grainMap.put(id, grainMap.get(id) + 1);
-        } else {
-            grainMap.put(id, 1);
-        }
-    }
-
-    private int getIDMaxNeighbour(Map<Integer, Integer> grainMap) {
-        Map.Entry<Integer, Integer> maxEntry = null;
-
-        for (Map.Entry<Integer, Integer> entry : grainMap.entrySet())
-            if (maxEntry == null || entry.getValue().compareTo(maxEntry.getValue()) > 0)
-                maxEntry = entry;
-
-        int id = 0;
-        if (maxEntry != null) {
-            int max = maxEntry.getValue();
-
-            List<Integer> listMax = new ArrayList<>();
-            for (Map.Entry<Integer, Integer> entry : grainMap.entrySet())
-                if (entry.getValue() == max)
-                    listMax.add(entry.getKey());
-
-            Random rand = new Random();
-            int randWinner = rand.nextInt(listMax.size());
-            id = listMax.get(randWinner);
-        }
-
-        return id;
     }
 
     public void copyArray() {

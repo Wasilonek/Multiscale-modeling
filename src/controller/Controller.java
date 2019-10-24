@@ -49,6 +49,9 @@ public class Controller {
     ChoiceBox inclusionTypeChoiceBox;
 
     @FXML
+    TextField probabilityTextField;
+
+    @FXML
     void initialize() {
         growthModel = new Growth();
         graphicsContext = canvas.getGraphicsContext2D();
@@ -368,6 +371,13 @@ public class Controller {
                 }
             }
         }
+    }
+
+    @FXML
+    public void furtherMooreAction() {
+        setGrains();
+        growthModel.furtherMoore(Integer.parseInt(probabilityTextField.getText()));
+        showGrid();
     }
 }
 
