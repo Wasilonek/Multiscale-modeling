@@ -6,6 +6,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 import model.Growth;
 import model.Main;
@@ -52,12 +53,21 @@ public class Controller {
     TextField probabilityTextField;
 
     @FXML
+    TextField boundarySizeTextField;
+
+    @FXML
+    ChoiceBox phaseChoiceBox;
+
+    @FXML
     void initialize() {
         growthModel = new Growth();
         graphicsContext = canvas.getGraphicsContext2D();
 
         inclusionTypeChoiceBox.setItems(FXCollections.observableArrayList("Square", "Circle"));
         inclusionTypeChoiceBox.setValue("Square");
+
+        phaseChoiceBox.setItems(FXCollections.observableArrayList("Substructure", "Dual phase"));
+        phaseChoiceBox.setValue("Substructure");
     }
 
     public void setGrains() {
@@ -151,7 +161,6 @@ public class Controller {
         int maxAttemptToRandomGrains = 0;
 
         if (growthModel.isArrayFull()) {
-            System.out.println("test");
             for (int i = 0; i < numberOfInclusions; ) {
 
                 x = random.nextInt(growthModel.getWidth());
@@ -167,7 +176,6 @@ public class Controller {
                 growthModel.getGrain(x, y).setInclusion(true);
                 growthModel.getGrain(x, y).setColor(javafx.scene.paint.Color.BLACK);
 
-//                System.out.println("Initial " + x + " " + y);
                 if (inclusionType == "Square") {
                     int step = (int) (inclusionSize / (2 * Math.sqrt(2))) / 2;
                     int stepsX = step / 2;
@@ -178,8 +186,8 @@ public class Controller {
                         stepsY = step / 2;
                         for (int j = 0; j < step; j++) {
                             int newY = y - stepsY;
-                            if(newX < 0 || newX > growthModel.getWidth()-1
-                                    || newY < 0 || newY > growthModel.getHeight()-1){
+                            if (newX < 0 || newX > growthModel.getWidth() - 1
+                                    || newY < 0 || newY > growthModel.getHeight() - 1) {
                                 continue;
                             }
                             System.out.println(newX + " " + newY);
@@ -191,24 +199,28 @@ public class Controller {
                         stepsX--;
                     }
                 } else if (inclusionType == "Circle") {
-                    System.out.println("Circle");
+
                     int step = (int) (inclusionSize / (2 * Math.sqrt(2))) / 2;
                     int stepsX = step / 2;
                     int stepsY = step / 2;
-                    System.out.println("step" + step);
+
                     for (int k = 0; k < step; k++) {
                         int newX = x - stepsX;
                         stepsY = step / 2;
                         for (int j = 0; j < step; j++) {
                             int newY = y - stepsY;
-                            if(newX < 0 || newX > growthModel.getWidth()
-                                    || newY < 0 || newY > growthModel.getHeight()){
+                            if (newX < 0 || newX > growthModel.getWidth()
+                                    || newY < 0 || newY > growthModel.getHeight()) {
                                 continue;
                             }
-                            System.out.println(newX + " " + newY);
-                            System.out.println(calcLength(newX, newY));
-                            if (calcLength( newX, newY) <= inclusionSize) {
-                                System.out.println("CIC");
+
+                            System.out.println(Math.abs(x - newX));
+                            System.out.println(Math.abs(y - newY));
+                            System.out.println(Math.pow(Math.abs(x - newX), 2) + Math.pow(Math.abs(y - newY), 2));
+                            System.out.println(step);
+                            System.out.println();
+
+                            if (Math.pow(Math.abs(x - newX), 2) + Math.pow(Math.abs(y - newY), 2) < step) {
                                 growthModel.getGrain(newX, newY).setState(1);
                                 growthModel.getGrain(newX, newY).setInclusion(true);
                                 growthModel.getGrain(newX, newY).setColor(javafx.scene.paint.Color.BLACK);
@@ -218,7 +230,6 @@ public class Controller {
                         stepsX--;
                     }
                 }
-
                 i++;
             }
         } else {
@@ -235,9 +246,7 @@ public class Controller {
                 }
                 growthModel.getGrain(x, y).setState(1);
                 growthModel.getGrain(x, y).setInclusion(true);
-//                growthModel.getGrain(x, y).setColor(javafx.scene.paint.Color.BLACK);
 
-//                System.out.println("Initial " + x + " " + y);
                 if (inclusionType == "Square") {
                     int step = (int) (inclusionSize / (2 * Math.sqrt(2))) / 2;
                     int stepsX = step / 2;
@@ -248,8 +257,8 @@ public class Controller {
                         stepsY = step / 2;
                         for (int j = 0; j < step; j++) {
                             int newY = y - stepsY;
-                            if(newX < 0 || newX > growthModel.getWidth()-1
-                                    || newY < 0 || newY > growthModel.getHeight()-1){
+                            if (newX < 0 || newX > growthModel.getWidth() - 1
+                                    || newY < 0 || newY > growthModel.getHeight() - 1) {
                                 continue;
                             }
                             System.out.println(newX + " " + newY);
@@ -261,43 +270,29 @@ public class Controller {
                         stepsX--;
                     }
                 } else if (inclusionType == "Circle") {
-//                    System.out.println("Circle");
-//                    int r = inclusionSize;
-//                    for (int k = y-r; k < y+r; k++) {
-//                        for (int j = x; Math.pow((j-x),2) + Math.pow((k-y),2) <= r^2; j--) {
-//                            //in the circle
-//                        }
-//                        for (int j = x+1; (j-x)*(j-x) + (k-y)*(k-y) <= r*r; j++) {
-//                            //in the circle
-//                        }
-//                    }
-//                    int step = (int) (inclusionSize / (2 * Math.sqrt(2))) / 2;
-//                    int stepsX = step / 2;
-//                    int stepsY = step / 2;
-////                    System.out.println("step " + step);
-//                    for (int k = 0; k < step; k++) {
-//                        int newX = x - stepsX;
-//                        stepsY = step / 2;
-//                        for (int j = 0; j < step; j++) {
-//                            int newY = y - stepsY;
-//                            if(newX < 0 || newX > growthModel.getWidth()-1
-//                                    || newY < 0 || newY > growthModel.getHeight()-1){
-//                                continue;
-//                            }
-////                            System.out.println(newX + " " + newY);
-//                            System.out.println("length: " + calcLength(newX, newY));
-//                            System.out.println("Length init" + calcLength(x, y));
-//                            System.out.println("Roznica " + (calcLength(newX, newY) - calcLength(x, y)));
-//                            if (calcLength(newX, newY) - calcLength(x, y) <= step) {
-//                                System.out.println("CIC");
-//                                growthModel.getGrain(newX, newY).setState(1);
-//                                growthModel.getGrain(newX, newY).setInclusion(true);
-//                                growthModel.getGrain(newX, newY).setColor(javafx.scene.paint.Color.BLACK);
-//                            }
-//                            stepsY--;
-//                        }
-//                        stepsX--;
-//                    }
+                    int step = (int) (inclusionSize / (2 * Math.sqrt(2))) / 2;
+                    int stepsX = step / 2;
+                    int stepsY;
+                    for (int k = 0; k < step; k++) {
+                        int newX = x - stepsX;
+                        stepsY = step / 2;
+                        for (int j = 0; j < step; j++) {
+                            int newY = y - stepsY;
+                            if (newX < 0 || newX > growthModel.getWidth() - 1
+                                    || newY < 0 || newY > growthModel.getHeight() - 1) {
+                                continue;
+                            }
+
+                            if (Math.pow(Math.abs(x - newX), 2) + Math.pow(Math.abs(y - newY), 2) < step) {
+                                System.out.println("CIC");
+                                growthModel.getGrain(newX, newY).setState(1);
+                                growthModel.getGrain(newX, newY).setInclusion(true);
+                                growthModel.getGrain(newX, newY).setColor(javafx.scene.paint.Color.BLACK);
+                            }
+                            stepsY--;
+                        }
+                        stepsX--;
+                    }
                 }
 
                 i++;
@@ -306,10 +301,6 @@ public class Controller {
 
         showGrid();
 
-    }
-
-    public double calcLength(int x2, int y2) {
-        return Math.sqrt(Math.pow((x2 - 0), 2) + Math.pow((y2 - 0), 2));
     }
 
     public void saveToBMP() {
@@ -358,7 +349,6 @@ public class Controller {
     }
 
     public void showGrid() {
-//        clearCanvas();
         for (int i = 0; i < growthModel.getWidth(); i++) {
             for (int j = 0; j < growthModel.getHeight(); j++) {
                 if (growthModel.getGrainState(i, j) == 1) {
@@ -378,6 +368,96 @@ public class Controller {
         setGrains();
         growthModel.furtherMoore(Integer.parseInt(probabilityTextField.getText()));
         showGrid();
+    }
+
+    @FXML
+    public void clearUnselectedGrainsAction() {
+        System.out.println("Clear unselected");
+        growthModel.clearUnselectedGrains();
+        showGrid();
+    }
+
+//    --------------------------------------------
+
+    @FXML
+    public void showBoundariesAction() {
+        int size = Integer.parseInt(boundarySizeTextField.getText());
+        graphicsContext.setFill(javafx.scene.paint.Color.BLACK);
+        for (int i = 0; i < growthModel.getWidth(); i++) {
+            for (int j = 0; j < growthModel.getHeight(); j++) {
+                if (growthModel.getGrain(i, j).isOnBorder()) {
+                    graphicsContext.fillRect(i * grainWidth, j * grainHeight, size, size);
+                    growthModel.getGrain(i, j).setInclusion(true);
+                }
+            }
+        }
+    }
+
+    @FXML
+    public void clearWithBoundariesAction() {
+        graphicsContext.setFill(javafx.scene.paint.Color.WHITE);
+        for (int i = 0; i < growthModel.getWidth(); i++) {
+            for (int j = 0; j < growthModel.getHeight(); j++) {
+                if (!growthModel.getGrain(i, j).isOnBorder()) {
+                    graphicsContext.fillRect(i * grainWidth, j * grainHeight, grainWidth, grainHeight);
+                    growthModel.getGrain(i, j).setInclusion(true);
+                }
+            }
+        }
+    }
+
+    @FXML
+    public void canvasClickedAction(MouseEvent mouseEvent) {
+        int x = (int) mouseEvent.getSceneX();
+        int y = (int) mouseEvent.getSceneY() - 25;
+        String phase = phaseChoiceBox.getValue().toString();
+        growthModel.selectGrain(x, y,phase);
+    }
+
+    @FXML
+    public void showSelectedBoundaryAction() {
+        graphicsContext.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        graphicsContext.setFill(javafx.scene.paint.Color.BLACK);
+        for (int i = 0; i < growthModel.getWidth(); i++) {
+            for (int j = 0; j < growthModel.getHeight(); j++) {
+                if (growthModel.getGrain(i, j).isOnBorder()) {
+                    for (int k = 0; k < growthModel.selectedGrainsIds.size(); k++) {
+                        if (growthModel.getGrain(i, j).getId() == (int) growthModel.selectedGrainsIds.get(k)) {
+                            graphicsContext.fillRect(i * grainWidth, j * grainHeight, grainWidth, grainHeight);
+                            growthModel.getGrain(i, j).setFrozen(true);
+                        }
+                    }
+                } else {
+                    growthModel.clearGrain(i, j);
+                }
+            }
+        }
+    }
+
+
+    @FXML
+    public void clearPhaseAction() {
+        growthModel.clearPhase();
+        graphicsContext.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        for (int i = 0; i < growthModel.getWidth(); i++) {
+            for (int j = 0; j < growthModel.getHeight(); j++) {
+                if (growthModel.getGrain(i, j).isGrainSelected()) {
+                    for (int k = 0; k < growthModel.selectedPhaseIds.size(); k++) {
+                        if (growthModel.getGrain(i, j).getId() == (int) growthModel.selectedPhaseIds.get(k)) {
+                            graphicsContext.setFill(growthModel.getGrain(i, j).getColor());
+                            graphicsContext.fillRect(i * grainWidth, j * grainHeight, grainWidth, grainHeight);
+                        }
+                    }
+                    for (int k = 0; k < growthModel.selectedDualIds.size(); k++) {
+                        if (growthModel.getGrain(i, j).getId() == (int) growthModel.selectedDualIds.get(k)) {
+                            graphicsContext.setFill(javafx.scene.paint.Color.RED);
+                            graphicsContext.fillRect(i * grainWidth, j * grainHeight, grainWidth, grainHeight);
+                        }
+                    }
+                }
+            }
+        }
+
     }
 }
 

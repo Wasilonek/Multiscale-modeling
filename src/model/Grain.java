@@ -9,6 +9,9 @@ public class Grain {
     private Color color;
     private boolean onBorder;
     private boolean isInclusion;
+    private boolean isGrainSelected;
+    private boolean frozen;
+
 
     public Grain() {
         state = nextState = 0;
@@ -16,6 +19,8 @@ public class Grain {
         color = null;
         onBorder = false;
         isInclusion = false;
+        isGrainSelected = false;
+        frozen = false;
     }
 
     public int getId() {
@@ -64,5 +69,21 @@ public class Grain {
 
     public void setInclusion(boolean inclusion) {
         isInclusion = inclusion;
+    }
+
+    public boolean isGrainSelected() {
+        return isGrainSelected;
+    }
+
+    public void setGrainSelected(boolean grainSelected) {
+        isGrainSelected = grainSelected;
+    }
+
+    public boolean isFrozen() {
+        return frozen;
+    }
+
+    public void setFrozen(boolean frozen) {
+        this.frozen = frozen;
     }
 }
