@@ -13,6 +13,7 @@ public class Main extends Application {
     }
 
     public static Stage primary;
+    public static Pane pane;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -20,7 +21,7 @@ public class Main extends Application {
         primary = primaryStage;
         FXMLLoader fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(this.getClass().getResource("/view/View.fxml"));
-        Pane pane = fxmlLoader.load();
+        pane = fxmlLoader.load();
 
         Scene scene = new Scene(pane);
         primaryStage.setScene(scene);

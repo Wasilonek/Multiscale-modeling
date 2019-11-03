@@ -2,10 +2,15 @@ package controller;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.PixelReader;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 import model.Growth;
@@ -59,6 +64,9 @@ public class Controller {
     ChoiceBox phaseChoiceBox;
 
     @FXML
+    CheckBox setBorderCheckBox;
+
+    @FXML
     void initialize() {
         growthModel = new Growth();
         graphicsContext = canvas.getGraphicsContext2D();
@@ -68,6 +76,7 @@ public class Controller {
 
         phaseChoiceBox.setItems(FXCollections.observableArrayList("Substructure", "Dual phase"));
         phaseChoiceBox.setValue("Substructure");
+
     }
 
     public void setGrains() {
@@ -370,14 +379,15 @@ public class Controller {
         showGrid();
     }
 
-    @FXML
-    public void clearUnselectedGrainsAction() {
-        System.out.println("Clear unselected");
-        growthModel.clearUnselectedGrains();
-        showGrid();
-    }
+    //    --------------------------------------------
 
-//    --------------------------------------------
+    @FXML
+    public void canvasClickedAction(MouseEvent mouseEvent) {
+        int x = (int) mouseEvent.getSceneX();
+        int y = (int) mouseEvent.getSceneY() - 25;
+        String phase = phaseChoiceBox.getValue().toString();
+        growthModel.selectGrain(x, y, phase );
+    }
 
     @FXML
     public void showBoundariesAction() {
@@ -387,7 +397,28 @@ public class Controller {
             for (int j = 0; j < growthModel.getHeight(); j++) {
                 if (growthModel.getGrain(i, j).isOnBorder()) {
                     graphicsContext.fillRect(i * grainWidth, j * grainHeight, size, size);
+                }
+            }
+        }
+        growthModel.clearArray();
+        WritableImage writableImage = new WritableImage((int) canvas.getWidth(), (int) canvas.getHeight());
+        WritableImage snapshot = canvas.snapshot(new SnapshotParameters(), writableImage);
+        PixelReader pixelReader = snapshot.getPixelReader();
+        for (int i = 0; i < growthModel.getWidth(); i++) {
+            for (int j = 0; j < growthModel.getHeight(); j++) {
+                int color = pixelReader.getArgb(i, j);
+                int red = (color >> 16) & 0xff;
+                int green = (color >> 8) & 0xff;
+                int blue = color & 0xff;
+                if (red == 0 && green == 0 && blue == 0) {
                     growthModel.getGrain(i, j).setInclusion(true);
+                    growthModel.getGrain(i, j).setState(1);
+                    growthModel.getGrain(i, j).setNextState(0);
+                    growthModel.getGrain(i, j).setColor(javafx.scene.paint.Color.BLACK);
+                    growthModel.getGrain(i, j).setId(-1);
+                    growthModel.getGrain(i, j).setOnBorder(false);
+                    growthModel.getGrain(i, j).setGrainSelected(false);
+                    growthModel.getGrain(i, j).setFrozen(false);
                 }
             }
         }
@@ -398,24 +429,17 @@ public class Controller {
         graphicsContext.setFill(javafx.scene.paint.Color.WHITE);
         for (int i = 0; i < growthModel.getWidth(); i++) {
             for (int j = 0; j < growthModel.getHeight(); j++) {
-                if (!growthModel.getGrain(i, j).isOnBorder()) {
+                if (!growthModel.getGrain(i, j).isInclusion()) {
                     graphicsContext.fillRect(i * grainWidth, j * grainHeight, grainWidth, grainHeight);
-                    growthModel.getGrain(i, j).setInclusion(true);
                 }
             }
         }
     }
 
-    @FXML
-    public void canvasClickedAction(MouseEvent mouseEvent) {
-        int x = (int) mouseEvent.getSceneX();
-        int y = (int) mouseEvent.getSceneY() - 25;
-        String phase = phaseChoiceBox.getValue().toString();
-        growthModel.selectGrain(x, y,phase);
-    }
 
     @FXML
     public void showSelectedBoundaryAction() {
+        int size = Integer.parseInt(boundarySizeTextField.getText());
         graphicsContext.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
         graphicsContext.setFill(javafx.scene.paint.Color.BLACK);
         for (int i = 0; i < growthModel.getWidth(); i++) {
@@ -423,17 +447,50 @@ public class Controller {
                 if (growthModel.getGrain(i, j).isOnBorder()) {
                     for (int k = 0; k < growthModel.selectedGrainsIds.size(); k++) {
                         if (growthModel.getGrain(i, j).getId() == (int) growthModel.selectedGrainsIds.get(k)) {
-                            graphicsContext.fillRect(i * grainWidth, j * grainHeight, grainWidth, grainHeight);
+                            graphicsContext.fillRect(i * grainWidth, j * grainHeight, size, size);
                             growthModel.getGrain(i, j).setFrozen(true);
                         }
                     }
-                } else {
-                    growthModel.clearGrain(i, j);
+                }
+            }
+        }
+        readInclusions();
+    }
+
+    public void readInclusions() {
+        WritableImage writableImage = new WritableImage((int) canvas.getWidth(), (int) canvas.getHeight());
+        WritableImage snapshot = canvas.snapshot(new SnapshotParameters(), writableImage);
+        PixelReader pixelReader = snapshot.getPixelReader();
+        for (int i = 0; i < growthModel.getWidth(); i++) {
+            for (int j = 0; j < growthModel.getHeight(); j++) {
+                int color = pixelReader.getArgb(i, j);
+                int red = (color >> 16) & 0xff;
+                int green = (color >> 8) & 0xff;
+                int blue = color & 0xff;
+                growthModel.clearGrain(i, j);
+                if (red == 0 && green == 0 && blue == 0) {
+                    growthModel.getGrain(i, j).setInclusion(true);
+                    growthModel.getGrain(i, j).setState(1);
                 }
             }
         }
     }
 
+
+    @FXML
+    public void regrowthAction() {
+        setGrains();
+
+        growthModel.regrowth();
+
+        growthModel.setBoundaries();
+
+        showGrid();
+
+    }
+
+
+//    ----------------------------------------------------------------
 
     @FXML
     public void clearPhaseAction() {
@@ -446,12 +503,16 @@ public class Controller {
                         if (growthModel.getGrain(i, j).getId() == (int) growthModel.selectedPhaseIds.get(k)) {
                             graphicsContext.setFill(growthModel.getGrain(i, j).getColor());
                             graphicsContext.fillRect(i * grainWidth, j * grainHeight, grainWidth, grainHeight);
+                            growthModel.getGrain(i, j).setFrozen(true);
+
                         }
                     }
                     for (int k = 0; k < growthModel.selectedDualIds.size(); k++) {
                         if (growthModel.getGrain(i, j).getId() == (int) growthModel.selectedDualIds.get(k)) {
                             graphicsContext.setFill(javafx.scene.paint.Color.RED);
                             graphicsContext.fillRect(i * grainWidth, j * grainHeight, grainWidth, grainHeight);
+                            growthModel.getGrain(i, j).setFrozen(true);
+                            growthModel.getGrain(i, j).setColor(javafx.scene.paint.Color.RED);
                         }
                     }
                 }

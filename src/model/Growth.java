@@ -76,15 +76,22 @@ public class Growth {
             x = random.nextInt(gridWidth);
             y = random.nextInt(gridHeight);
 
-            if (grains[x][y].getState() == 1) {
-                if (maxAttemptToRandomGrains == 10000)
+            if (grains[x][y].getState() == 1 && grains[x][y].isInclusion()) {
+                if (maxAttemptToRandomGrains == 10000){
+                    System.out.println("Rand error");
                     break;
+                }
+
                 maxAttemptToRandomGrains++;
                 continue;
             }
             grains[x][y].setState(1);
             grains[x][y].setId(i);
             grains[x][y].setColor(colorForEveryId.get(grains[x][y].getId()));
+            grains[x][y].setInclusion(false);
+            grains[x][y].setFrozen(false);
+            grains[x][y].setGrainSelected(false);
+            grains[x][y].setOnBorder(false);
             i++;
         }
     }
@@ -179,13 +186,17 @@ public class Growth {
         return false;
     }
 
+
     public void moore() {
         int numberOfGrainNeigbours;
 
         do {
             isArrayFull = false;
+
+
             for (int i = 0; i < gridWidth; i++) {
                 for (int j = 0; j < gridHeight; j++) {
+
                     grainMap.clear();
                     colorMap.clear();
                     numberOfGrainNeigbours = 0;
@@ -240,6 +251,78 @@ public class Growth {
             }
 
             copyArray();
+        } while (isArrayFull);
+        isArrayFull = true;
+        setBoundaries();
+    }
+
+    public void regrowth() {
+        int numberOfGrainNeigbours;
+        int attempts = 0;
+
+        do {
+            isArrayFull = false;
+            for (int i = 0; i < gridWidth; i++) {
+                for (int j = 0; j < gridHeight; j++) {
+                    grainMap.clear();
+                    colorMap.clear();
+                    numberOfGrainNeigbours = 0;
+                    attempts++;
+                    if (!grains[i][j].isInclusion() && grains[i][j].getState() == 0) {
+
+                        attempts = 0;
+                        isArrayFull = true;
+                        setEdge(i, j);
+
+
+                        if (checkLeftUpperNeigbour(indUp, indLeft)) {
+                            numberOfGrainNeigbours++;
+                        }
+
+                        if (checkMiddleUpperNeigbour(indUp, j)) {
+                            numberOfGrainNeigbours++;
+                        }
+
+                        if (checkRightUpperNeigbour(indUp, indRight)) {
+                            numberOfGrainNeigbours++;
+                        }
+
+                        if (checkLeftNeigbour(i, indLeft)) {
+                            numberOfGrainNeigbours++;
+                        }
+
+                        if (checkRightNeigbour(i, indRight)) {
+                            numberOfGrainNeigbours++;
+                        }
+
+                        if (checkLeftBottomNeigbour(indDown, indLeft)) {
+                            numberOfGrainNeigbours++;
+                        }
+
+                        if (checkMiddleBottomNeigbour(indDown, j)) {
+                            numberOfGrainNeigbours++;
+                        }
+
+                        if (checkRightBottomNeigbour(indDown, indRight)) {
+                            numberOfGrainNeigbours++;
+                        }
+
+
+                        if (numberOfGrainNeigbours > 0) {
+                            idToAssign = getIDMaxNeighbour(grainMap);
+                            grains[i][j].setNextState(1);
+                            grains[i][j].setColor(colorMap.get(idToAssign));
+                            grains[i][j].setId(idToAssign);
+                            grains[i][j].setInclusion(false);
+                        }
+                    }
+                }
+            }
+
+            copyArray();
+            if(attempts > 1000) {
+                break;
+            }
         } while (isArrayFull);
         isArrayFull = true;
         setBoundaries();
@@ -557,10 +640,14 @@ public class Growth {
                 grains[i][j].setOnBorder(false);
                 grains[i][j].setInclusion(false);
                 grains[i][j].setGrainSelected(false);
+                grains[i][j].setFrozen(false);
+
             }
         }
         isArrayFull = false;
         selectedGrainsIds.clear();
+        selectedPhaseIds.clear();
+        selectedDualIds.clear();
     }
 
     public void clearGrain(int i, int j) {
@@ -571,23 +658,10 @@ public class Growth {
         grains[i][j].setOnBorder(false);
         grains[i][j].setInclusion(false);
         grains[i][j].setGrainSelected(false);
-    }
-
-    public void clearUnselectedGrains() {
-        for (int i = 0; i < gridWidth; i++) {
-            for (int j = 0; j < gridHeight; j++) {
-                if (grains[i][j].isGrainSelected()) {
-                    System.out.println(grains[i][j].getId());
-                    System.out.println(grains[i][j].getColor());
-                }
-            }
-        }
+        grains[i][j].setFrozen(false);
     }
 
     public void saveToTxt(File filePath) {
-
-
-        System.out.println(filePath);
         try {
             FileWriter fileReader = new FileWriter(new File(String.valueOf(filePath)));
             BufferedWriter bufferWritter = new BufferedWriter(fileReader);
@@ -627,7 +701,6 @@ public class Growth {
         }
 
         createGrid(img.getWidth(), img.getHeight());
-        System.out.println(gridWidth + " " + gridHeight);
 
         Map<Integer, Color> loadedColors = new HashMap<>();
 
@@ -740,16 +813,39 @@ public class Growth {
 //    ---------------------------------------------
 
     public void selectGrain(int x, int y, String phase) {
+        boolean unselect = false;
         int selectedGrainId = grains[x][y].getId();
-        System.out.println(phase);
-        if(phase == "Substructure") {
-            selectedPhaseIds.add(selectedGrainId);
-        } else {
-            selectedDualIds.add(selectedGrainId);
-        }
-        selectedGrainsIds.add(selectedGrainId);
 
-        selectGrains(selectedGrainId);
+        if (selectedPhaseIds.indexOf(selectedGrainId) != -1) {
+            selectedPhaseIds.remove(selectedPhaseIds.indexOf(selectedGrainId));
+            unselect = true;
+        }
+
+        if (selectedDualIds.indexOf(selectedGrainId) != -1) {
+            selectedDualIds.remove(selectedDualIds.indexOf(selectedGrainId));
+            unselect = true;
+        }
+
+        if (selectedGrainsIds.indexOf(selectedGrainId) != -1) {
+            selectedGrainsIds.remove(selectedGrainsIds.indexOf(selectedGrainId));
+            unselect = true;
+        }
+
+        if (!unselect) {
+            if (phase == "Substructure") {
+                selectedPhaseIds.add(selectedGrainId);
+                System.out.println(phase);
+            } else {
+                selectedDualIds.add(selectedGrainId);
+                System.out.println(phase);
+            }
+            selectedGrainsIds.add(selectedGrainId);
+
+            selectGrains(selectedGrainId);
+        } else {
+            unselectGrains(selectedGrainId);
+        }
+
     }
 
     private void selectGrains(int id) {
@@ -757,6 +853,18 @@ public class Growth {
             for (int j = 0; j < gridHeight; j++) {
                 if (grains[i][j].getId() == id) {
                     grains[i][j].setGrainSelected(true);
+                    grains[i][j].setFrozen(true);
+                }
+            }
+        }
+    }
+
+    public void unselectGrains(int id) {
+        for (int i = 0; i < gridWidth; i++) {
+            for (int j = 0; j < gridHeight; j++) {
+                if (grains[i][j].getId() == id) {
+                    grains[i][j].setGrainSelected(false);
+                    grains[i][j].setFrozen(false);
                 }
             }
         }
@@ -775,6 +883,7 @@ public class Growth {
                     grains[i][j].setOnBorder(false);
                     grains[i][j].setInclusion(false);
                     grains[i][j].setGrainSelected(false);
+                    grains[i][j].setFrozen(false);
                 }
 
             }
