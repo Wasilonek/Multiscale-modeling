@@ -33,6 +33,8 @@ public class Controller {
 
     boolean isgridCreated = false;
 
+    boolean isLoadedFromFile = false;
+
     @FXML
     Canvas canvas;
 
@@ -88,10 +90,21 @@ public class Controller {
             canvas.setWidth(width);
             canvas.setHeight(height);
 
-            growthModel.createGrid((int) canvas.getWidth() / grainWidth, (int) canvas.getHeight() / grainHeight);
-            isgridCreated = true;
-        }
 
+            if(isLoadedFromFile){
+                isLoadedFromFile = false;
+            }else {
+                growthModel.createGrid((int) canvas.getWidth() / grainWidth, (int) canvas.getHeight() / grainHeight);
+                isgridCreated = true;
+
+            }
+
+            for (int i = 0; i < growthModel.getWidth(); i++) {
+                for (int j = 0; j < growthModel.getHeight(); j++) {
+                    System.out.println(growthModel.getGrain(i,j).getState());
+                }
+            }
+        }
 
         growthModel.randColorForEveryId(Integer.parseInt(numberOfGrainsField.getText()));
 
@@ -115,6 +128,7 @@ public class Controller {
 
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Txt file (.txt)", ".bmp");
         fileChooser.getExtensionFilters().add(extFilter);
+        fileChooser.setInitialDirectory(new File("./"));
 
         File file = fileChooser.showSaveDialog(Main.primary);
 
@@ -130,12 +144,14 @@ public class Controller {
     @FXML
     public void loadFromBitMapAction() {
         growthModel.loadFromBMP();
+        isLoadedFromFile = true;
         showGrid();
     }
 
     @FXML
     public void loadFromTextFileAction() {
         growthModel.loadFromTextFile();
+        isLoadedFromFile = true;
         showGrid();
     }
 
@@ -318,6 +334,7 @@ public class Controller {
 
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("BMP file (.bmp)", ".bmp");
         fileChooser.getExtensionFilters().add(extFilter);
+        fileChooser.setInitialDirectory(new File("./"));
 
         File file = fileChooser.showSaveDialog(Main.primary);
 
@@ -341,6 +358,15 @@ public class Controller {
 
                     graphic.setColor(awtColor);
                     graphic.fillRect(i * grainWidth, j * grainHeight, grainWidth, grainHeight);
+                } else {
+                    System.out.println("BLACK");
+                    javafx.scene.paint.Color fxColor = growthModel.getGrain(i, j).getColor();
+
+
+                        java.awt.Color awtColor = new java.awt.Color(1,1,1,1);
+                        graphic.setColor(new java.awt.Color(255,255,255));
+                        graphic.fillRect(i * grainWidth, j * grainHeight, grainWidth, grainHeight);
+
                 }
             }
         }

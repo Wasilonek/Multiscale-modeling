@@ -76,8 +76,8 @@ public class Growth {
             x = random.nextInt(gridWidth);
             y = random.nextInt(gridHeight);
 
-            if (grains[x][y].getState() == 1 && grains[x][y].isInclusion()) {
-                if (maxAttemptToRandomGrains == 10000){
+            if (grains[x][y].getState() == 1) {
+                if (maxAttemptToRandomGrains == 10000) {
                     System.out.println("Rand error");
                     break;
                 }
@@ -189,9 +189,11 @@ public class Growth {
 
     public void moore() {
         int numberOfGrainNeigbours;
+        boolean isGrainChange;
 
         do {
             isArrayFull = false;
+            isGrainChange = false;
 
 
             for (int i = 0; i < gridWidth; i++) {
@@ -239,6 +241,8 @@ public class Growth {
 
 
                         if (numberOfGrainNeigbours > 0) {
+                            isGrainChange = true;
+
                             idToAssign = getIDMaxNeighbour(grainMap);
                             grains[i][j].setNextState(1);
                             grains[i][j].setColor(colorMap.get(idToAssign));
@@ -251,26 +255,24 @@ public class Growth {
             }
 
             copyArray();
-        } while (isArrayFull);
+        } while (isArrayFull && isGrainChange);
         isArrayFull = true;
         setBoundaries();
     }
 
     public void regrowth() {
         int numberOfGrainNeigbours;
-        int attempts = 0;
+        boolean isGrainChange;
 
         do {
             isArrayFull = false;
+            isGrainChange = false;
             for (int i = 0; i < gridWidth; i++) {
                 for (int j = 0; j < gridHeight; j++) {
                     grainMap.clear();
                     colorMap.clear();
                     numberOfGrainNeigbours = 0;
-                    attempts++;
                     if (!grains[i][j].isInclusion() && grains[i][j].getState() == 0) {
-
-                        attempts = 0;
                         isArrayFull = true;
                         setEdge(i, j);
 
@@ -309,6 +311,7 @@ public class Growth {
 
 
                         if (numberOfGrainNeigbours > 0) {
+                            isGrainChange = true;
                             idToAssign = getIDMaxNeighbour(grainMap);
                             grains[i][j].setNextState(1);
                             grains[i][j].setColor(colorMap.get(idToAssign));
@@ -318,35 +321,40 @@ public class Growth {
                     }
                 }
             }
-
             copyArray();
-            if(attempts > 1000) {
-                break;
-            }
-        } while (isArrayFull);
+        } while (isArrayFull && isGrainChange);
         isArrayFull = true;
         setBoundaries();
     }
 
     public void furtherMoore(int probability) {
+        boolean isGrainChange = false;
         do {
             isArrayFull = false;
+            isGrainChange = false;
             for (int i = 0; i < gridWidth; i++) {
                 for (int j = 0; j < gridHeight; j++) {
                     if (grains[i][j].getState() == 0 && grains[i][j].isInclusion() == false) {
                         setEdge(i, j);
                         isArrayFull = true;
                         if (firstRule(i, j)) {
+                            isGrainChange = true;
                         } else if (secondRule(i, j)) {
+                            isGrainChange = true;
+
                         } else if (thirdRule(i, j)) {
+                            isGrainChange = true;
+
                         } else if (fourthRule(i, j, probability)) {
+                            isGrainChange = true;
+
                         }
                     }
 
                 }
             }
             copyArray();
-        } while (isArrayFull);
+        } while (isArrayFull && isGrainChange);
         isArrayFull = true;
         setBoundaries();
     }
@@ -511,6 +519,8 @@ public class Growth {
                 idToAssign = getIDMaxNeighbour(grainMap);
                 setGrain(i, j, idToAssign);
                 return false;
+            } else {
+                return true;
             }
 
         }
@@ -720,7 +730,7 @@ public class Growth {
 
                 //get blue
                 int b = p & 0xff;
-                System.out.println(r + "   " + b + "   " + g);
+//                System.out.println(r + "   " + b + "   " + g);
 
                 Color newColor = Color.rgb(r, g, b);
 
@@ -739,6 +749,10 @@ public class Growth {
                     grain.setInclusion(true);
                 }
 
+                if (r == 255 & b == 255 && g == 255) {
+                    grain.setState(0);
+                }
+
 
                 for (Map.Entry<Integer, Color> entry : loadedColors.entrySet()) {
                     if (Objects.equals(newColor, entry.getValue())) {
@@ -749,6 +763,11 @@ public class Growth {
             }
         }
         setBoundaries();
+        for (int i = 0; i < gridWidth; i++) {
+            for (int j = 0; j < gridHeight; j++) {
+                System.out.println(grains[i][j].getState());
+            }
+        }
     }
 
     public void loadFromTextFile() {
