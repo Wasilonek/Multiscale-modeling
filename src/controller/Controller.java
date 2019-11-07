@@ -7,6 +7,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
@@ -21,6 +22,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.Random;
 
 
@@ -69,6 +71,9 @@ public class Controller {
     CheckBox setBorderCheckBox;
 
     @FXML
+    Label GBLabel;
+
+    @FXML
     void initialize() {
         growthModel = new Growth();
         graphicsContext = canvas.getGraphicsContext2D();
@@ -99,11 +104,11 @@ public class Controller {
 
             }
 
-            for (int i = 0; i < growthModel.getWidth(); i++) {
-                for (int j = 0; j < growthModel.getHeight(); j++) {
-                    System.out.println(growthModel.getGrain(i,j).getState());
-                }
-            }
+//            for (int i = 0; i < growthModel.getWidth(); i++) {
+//                for (int j = 0; j < growthModel.getHeight(); j++) {
+//                    System.out.println(growthModel.getGrain(i,j).getState());
+//                }
+//            }
         }
 
         growthModel.randColorForEveryId(Integer.parseInt(numberOfGrainsField.getText()));
@@ -452,14 +457,20 @@ public class Controller {
 
     @FXML
     public void clearWithBoundariesAction() {
+        double holeSize = growthModel.getWidth() * growthModel.getHeight();
+        double boundarySize = 0;
         graphicsContext.setFill(javafx.scene.paint.Color.WHITE);
         for (int i = 0; i < growthModel.getWidth(); i++) {
             for (int j = 0; j < growthModel.getHeight(); j++) {
                 if (!growthModel.getGrain(i, j).isInclusion()) {
                     graphicsContext.fillRect(i * grainWidth, j * grainHeight, grainWidth, grainHeight);
+                } else {
+                    boundarySize++;
                 }
             }
         }
+        DecimalFormat df2 = new DecimalFormat("#.##");
+        GBLabel.setText("" + df2.format(boundarySize/holeSize));
     }
 
 
