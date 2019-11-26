@@ -14,6 +14,8 @@ public class Grain {
     private boolean isInclusion;
     private boolean isGrainSelected;
     private boolean frozen;
+    private boolean dualPhase;
+    private double energy;
 
     public Grain() {
         x = -1;
@@ -26,6 +28,8 @@ public class Grain {
         isInclusion = false;
         isGrainSelected = false;
         frozen = false;
+        dualPhase = false;
+        energy = 0;
     }
 
     public int getId() {
@@ -114,5 +118,21 @@ public class Grain {
 
     public void setY(int y) {
         this.y = y;
+    }
+
+    public boolean isDualPhase() {
+        return dualPhase;
+    }
+
+    public void setDualPhase(boolean dualPhase) {
+        this.dualPhase = dualPhase;
+    }
+
+    public double getEnergy() {
+        return energy;
+    }
+
+    public void setEnergy(double energy) {
+        this.energy = energy;
     }
 }

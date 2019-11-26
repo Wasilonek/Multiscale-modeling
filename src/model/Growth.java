@@ -34,7 +34,7 @@ public class Growth {
     public List selectedPhaseIds;
     public List selectedDualIds;
 
-//    ******************** Monte Carlo ****************
+    //    ******************** Monte Carlo ****************
     public List monteCarloGrainsList;
     public List monteCarloCounters;
 
@@ -110,7 +110,7 @@ public class Growth {
 
     public boolean checkLeftUpperNeigbour(int indUp, int indLeft) {
         if (grains[indUp][indLeft].getState() == 1 && grains[indUp][indLeft].isInclusion() == false
-                && !grains[indUp][indLeft].isGrainSelected() && !grains[indUp][indLeft].isFrozen()) {
+                && !grains[indUp][indLeft].isGrainSelected() && !grains[indUp][indLeft].isFrozen() && !grains[indUp][indLeft].isDualPhase()) {
 
             id = grains[indUp][indLeft].getId();
             fillMap(id, grainMap);
@@ -122,7 +122,7 @@ public class Growth {
 
     public boolean checkMiddleUpperNeigbour(int indUp, int j) {
         if (grains[indUp][j].getState() == 1 && grains[indUp][j].isInclusion() == false
-                && !grains[indUp][j].isGrainSelected() && !grains[indUp][j].isFrozen()) {
+                && !grains[indUp][j].isGrainSelected() && !grains[indUp][j].isFrozen() && !grains[indUp][j].isDualPhase()) {
             id = grains[indUp][j].getId();
             fillMap(id, grainMap);
             colorMap.put(id, grains[indUp][j].getColor());
@@ -133,7 +133,7 @@ public class Growth {
 
     public boolean checkRightUpperNeigbour(int indUp, int indRight) {
         if (grains[indUp][indRight].getState() == 1 && grains[indUp][indRight].isInclusion() == false
-                && !grains[indUp][indRight].isGrainSelected() && !grains[indUp][indRight].isFrozen()) {
+                && !grains[indUp][indRight].isGrainSelected() && !grains[indUp][indRight].isFrozen() && !grains[indUp][indRight].isDualPhase()) {
             id = grains[indUp][indRight].getId();
             fillMap(id, grainMap);
             colorMap.put(id, grains[indUp][indRight].getColor());
@@ -144,7 +144,7 @@ public class Growth {
 
     public boolean checkLeftNeigbour(int i, int indLeft) {
         if (grains[i][indLeft].getState() == 1 && grains[i][indLeft].isInclusion() == false
-                && !grains[i][indLeft].isGrainSelected() && !grains[i][indLeft].isFrozen()) {
+                && !grains[i][indLeft].isGrainSelected() && !grains[i][indLeft].isFrozen() && !grains[i][indLeft].isDualPhase()) {
             id = grains[i][indLeft].getId();
             fillMap(id, grainMap);
             colorMap.put(id, grains[i][indLeft].getColor());
@@ -155,7 +155,7 @@ public class Growth {
 
     public boolean checkRightNeigbour(int i, int indRight) {
         if (grains[i][indRight].getState() == 1 && grains[i][indRight].isInclusion() == false
-                && !grains[i][indRight].isGrainSelected() && !grains[i][indRight].isFrozen()) {
+                && !grains[i][indRight].isGrainSelected() && !grains[i][indRight].isFrozen() && !grains[i][indRight].isDualPhase()) {
             id = grains[i][indRight].getId();
             fillMap(id, grainMap);
             colorMap.put(id, grains[i][indRight].getColor());
@@ -166,7 +166,7 @@ public class Growth {
 
     public boolean checkLeftBottomNeigbour(int indDown, int indLeft) {
         if (grains[indDown][indLeft].getState() == 1 && grains[indDown][indLeft].isInclusion() == false
-                && !grains[indDown][indLeft].isGrainSelected() && !grains[indDown][indLeft].isFrozen()) {
+                && !grains[indDown][indLeft].isGrainSelected() && !grains[indDown][indLeft].isFrozen() && !grains[indDown][indLeft].isDualPhase()) {
             id = grains[indDown][indLeft].getId();
             fillMap(id, grainMap);
             colorMap.put(id, grains[indDown][indLeft].getColor());
@@ -177,7 +177,7 @@ public class Growth {
 
     public boolean checkMiddleBottomNeigbour(int indDown, int j) {
         if (grains[indDown][j].getState() == 1 && grains[indDown][j].isInclusion() == false
-                && !grains[indDown][j].isGrainSelected() && !grains[indDown][j].isFrozen()) {
+                && !grains[indDown][j].isGrainSelected() && !grains[indDown][j].isFrozen() && !grains[indDown][j].isDualPhase()) {
             id = grains[indDown][j].getId();
             fillMap(id, grainMap);
             colorMap.put(id, grains[indDown][j].getColor());
@@ -189,7 +189,7 @@ public class Growth {
 
     public boolean checkRightBottomNeigbour(int indDown, int indRight) {
         if (grains[indDown][indRight].getState() == 1 && grains[indDown][indRight].isInclusion() == false
-                && !grains[indDown][indRight].isGrainSelected() && !grains[indDown][indRight].isFrozen()) {
+                && !grains[indDown][indRight].isGrainSelected() && !grains[indDown][indRight].isFrozen() && !grains[indDown][indRight].isDualPhase()) {
             id = grains[indDown][indRight].getId();
             fillMap(id, grainMap);
             colorMap.put(id, grains[indDown][indRight].getColor());
@@ -214,7 +214,7 @@ public class Growth {
                     grainMap.clear();
                     colorMap.clear();
                     numberOfGrainNeigbours = 0;
-                    if (grains[i][j].getState() == 0 && !grains[i][j].isInclusion() && !grains[i][j].isGrainSelected()) {
+                    if (grains[i][j].getState() == 0 && !grains[i][j].isInclusion() && !grains[i][j].isGrainSelected() && !grains[i][j].isDualPhase()) {
                         isArrayFull = true;
                         setEdge(i, j);
 
@@ -687,6 +687,7 @@ public class Growth {
         grains[i][j].setInclusion(false);
         grains[i][j].setGrainSelected(false);
         grains[i][j].setFrozen(false);
+        grains[i][j].setDualPhase(false);
     }
 
     public void saveToTxt(File filePath) {
@@ -933,26 +934,27 @@ public class Growth {
     }
 
 
-
     public void fillSpaceWithGrains(int numberOfStates) {
         monteCarloCounters.clear();
         monteCarloGrainsList.clear();
         int counter = 0;
+//
+//        for (int i = 0; i < gridWidth; i++) {
+//            for (int j = 0; j < gridHeight; j++) {
+//                if (grains[i][j].isFrozen() || grains[i][j].isGrainSelected() || selectedDualIds.contains(grains[i][j].getId())) {
+//                    System.out.println(counter++);
+//                }
+//            }
+//        }
 
-        for (int i = 0; i < gridWidth; i++) {
-            for (int j = 0; j < gridHeight; j++) {
-                if(grains[i][j].isFrozen() || grains[i][j].isGrainSelected() || selectedDualIds.contains(grains[i][j].getId())) {
-                    System.out.println(counter++);;
-                }
-            }
-        }
-
+//        int dualPhaseNum = 0;
         for (int i = 0; i < gridWidth; i++) {
             for (int j = 0; j < gridHeight; j++) {
                 int id = random.nextInt(numberOfStates);
-                if(grains[i][j].isFrozen() || selectedDualIds.contains(grains[i][j].getId())) {
-                    continue;
-                }
+//                if (grains[i][j].isDualPhase()) {
+//                    dualPhaseNum++;
+//                    continue;
+//                }
 
                 grains[i][j].setX(i);
                 grains[i][j].setY(j);
@@ -962,189 +964,229 @@ public class Growth {
                 grains[i][j].set_ID(counter);
                 monteCarloGrainsList.add(grains[i][j]);
                 monteCarloCounters.add(counter++);
-
             }
         }
+//        System.out.println("Dual Phase Num: " + dualPhaseNum);
+//        System.out.println("Num of grains: " + monteCarloGrainsList.size());
+//        System.out.println("Sum of grains: " + (monteCarloGrainsList.size() + dualPhaseNum));
     }
 
 
-
-
-    private List switchItem(List list,int from,int to) {
-//        Grain temp = (Grain) list.get(from);
+    private List switchItem(List list, int from, int to) {
         int temp = (int) list.get(from);
-
-        list.set(from,list.get(to));
-        list.set(to,temp);
+        list.set(from, list.get(to));
+        list.set(to, temp);
         return list;
     }
 
     private void getRandomUniqueValues() {
-        for(var i = 0; i < monteCarloCounters.size(); i++) {
-            int randomPosition = (int) Math.floor(Math.random() * Math.floor(monteCarloCounters.size() - i -1));
-//            System.out.println(monteCarloGrainsList.get(randomPosition));
-            monteCarloCounters = switchItem(monteCarloCounters,randomPosition,monteCarloCounters.size() - 1 - i);
+        for (var i = 0; i < monteCarloCounters.size(); i++) {
+            int randomPosition = (int) Math.floor(Math.random() * Math.floor(monteCarloCounters.size() - i - 1));
+            monteCarloCounters = switchItem(monteCarloCounters, randomPosition, monteCarloCounters.size() - 1 - i);
         }
     }
 
-
-
     public void MonteCarloGrowth(int numberOfIterations, double constant) {
         List copy = new ArrayList(monteCarloCounters);
-        List localNeighboursIds =  new ArrayList();
-        Set loc = new HashSet();
-        List used = new ArrayList();
+        List localNeighboursIds = new ArrayList();
+
+        System.out.println("Copy: " + copy.size());
+        System.out.println("Grains: " + monteCarloGrainsList.size());
+        System.out.println("Counter: " + monteCarloCounters.size());
+
 
         int x = -1;
         int y = -1;
 
-//        Set hSet = new HashSet<>(monteCarloGrainsList);
-//        System.out.println(hSet.size());
-
 
         for (int k = 0; k < numberOfIterations; k++) {
-            System.out.println(k);
+//            System.out.println(k);
             monteCarloCounters = new ArrayList(copy);
             getRandomUniqueValues();
-            int g;
-            for(g = 0; g < monteCarloCounters.size(); g++) {
-//                System.out.println(g);
+
+            for (int g = 0; g < monteCarloCounters.size(); g++) {
+
                 localNeighboursIds.clear();
 
-//                if(monteCarloGrainsList.size() == 0) {
-//                    break;
-//                }
 
                 Grain grain = (Grain) monteCarloGrainsList.get((Integer) monteCarloCounters.get(g));
-                if(grain.isGrainSelected() || selectedDualIds.contains(grain.getId())) {
-                    System.out.println(grain.getId());
+                if (grain.isDualPhase()) {
                     continue;
                 }
-//                Object key;
-//                do{
-//                Object[] Keys = monteCarloGrainsMap.keySet().toArray();
-//                key = Keys[new Random().nextInt(Keys.length)];
-//                if(!used.contains(key)) {
-//                    break;
-//                }}while (true);
-//                grain = monteCarloGrainsMap.get(key);
 
                 x = grain.getX();
                 y = grain.getY();
-//                monteCarloGrainsMap.remove(key);
 
                 setEdge(x, y);
 
 
                 if (grains[indUp][indLeft].getId() != grains[x][y].getId()) {
-                    localNeighboursIds.add(grains[indUp][indLeft].getId());
+                    if (!grains[indUp][indLeft].isDualPhase()) {
+                        localNeighboursIds.add(grains[indUp][indLeft].getId());
+                    }
                 }
 
                 if (grains[indUp][y].getId() != grains[x][y].getId()) {
-                    localNeighboursIds.add(grains[indUp][y].getId());
+                    if (!grains[indUp][y].isDualPhase()) {
+                        localNeighboursIds.add(grains[indUp][y].getId());
+                    }
                 }
 
                 if (grains[indUp][indRight].getId() != grains[x][y].getId()) {
-                    localNeighboursIds.add(grains[indUp][indRight].getId());
+                    if (!grains[indUp][indRight].isDualPhase()) {
+                        localNeighboursIds.add(grains[indUp][indRight].getId());
+                    }
                 }
 
                 if (grains[x][indLeft].getId() != grains[x][y].getId()) {
-                    localNeighboursIds.add(grains[x][indRight].getId());
+                    if (!grains[x][indLeft].isDualPhase()) {
+                        localNeighboursIds.add(grains[x][indLeft].getId());
+                    }
                 }
 
                 if (grains[x][indRight].getId() != grains[x][y].getId()) {
-                    localNeighboursIds.add(grains[x][indRight].getId());
+                    if (!grains[x][indRight].isDualPhase()) {
+                        localNeighboursIds.add(grains[x][indRight].getId());
+                    }
                 }
 
                 if (grains[indDown][indLeft].getId() != grains[x][y].getId()) {
-                    localNeighboursIds.add(grains[indDown][indLeft].getId());
+                    if (!grains[indDown][indLeft].isDualPhase()) {
+                        localNeighboursIds.add(grains[indDown][indLeft].getId());
+                    }
                 }
 
                 if (grains[indDown][y].getId() != grains[x][y].getId()) {
-                    localNeighboursIds.add(grains[indDown][y].getId());
+                    if (!grains[indDown][y].isDualPhase()) {
+                        localNeighboursIds.add(grains[indDown][y].getId());
+                    }
                 }
 
                 if (grains[indDown][indRight].getId() != grains[x][y].getId()) {
-                    localNeighboursIds.add(grains[indDown][indRight].getId());
+                    if (!grains[indDown][indRight].isDualPhase()) {
+                        localNeighboursIds.add(grains[indDown][indRight].getId());
+                    }
                 }
-
-
-
 
 
                 double oldEnergy = constant * localNeighboursIds.size();
 
-                if(localNeighboursIds.size() != 0) {
+                if (localNeighboursIds.size() != 0) {
 
                     int newId = (int) localNeighboursIds.get(random.nextInt(localNeighboursIds.size()));
 
 
-
-
-
-
                     localNeighboursIds.clear();
                     if (grains[indUp][indLeft].getId() != newId) {
-                        localNeighboursIds.add(grains[indUp][indLeft].getId());
+                        if (!grains[indUp][indLeft].isDualPhase()) {
+                            localNeighboursIds.add(grains[indUp][indLeft].getId());
+                        }
                     }
 
                     if (grains[indUp][y].getId() != newId) {
-                        localNeighboursIds.add(grains[indUp][y].getId());
+                        if (!grains[indUp][y].isDualPhase()) {
+                            localNeighboursIds.add(grains[indUp][y].getId());
+                        }
                     }
 
                     if (grains[indUp][indRight].getId() != newId) {
-                        localNeighboursIds.add(grains[indUp][indRight].getId());
+                        if (!grains[indUp][indRight].isDualPhase()) {
+                            localNeighboursIds.add(grains[indUp][indRight].getId());
+                        }
                     }
 
                     if (grains[x][indLeft].getId() != newId) {
-                        localNeighboursIds.add(grains[x][indRight].getId());
+                        if (!grains[x][indLeft].isDualPhase()) {
+                            localNeighboursIds.add(grains[x][indLeft].getId());
+                        }
                     }
 
                     if (grains[x][indRight].getId() != newId) {
-                        localNeighboursIds.add(grains[x][indRight].getId());
+                        if (!grains[x][indRight].isDualPhase()) {
+                            localNeighboursIds.add(grains[x][indRight].getId());
+                        }
                     }
 
                     if (grains[indDown][indLeft].getId() != newId) {
-                        localNeighboursIds.add(grains[indDown][indLeft].getId());
+                        if (!grains[indDown][indLeft].isDualPhase()) {
+                            localNeighboursIds.add(grains[indDown][indLeft].getId());
+                        }
                     }
 
                     if (grains[indDown][y].getId() != newId) {
-                        localNeighboursIds.add(grains[indDown][y].getId());
+                        if (!grains[indDown][y].isDualPhase()) {
+                            localNeighboursIds.add(grains[indDown][y].getId());
+                        }
                     }
 
                     if (grains[indDown][indRight].getId() != newId) {
-                        localNeighboursIds.add(grains[indDown][indRight].getId());
+                        if (!grains[indDown][indRight].isDualPhase()) {
+                            localNeighboursIds.add(grains[indDown][indRight].getId());
+                        }
                     }
 
                     double newEnergy = constant * localNeighboursIds.size();
                     double delta = newEnergy - oldEnergy;
 
-                    if(delta <= 0) {
-//                    System.out.println("OLD:" + grains[x][y].getColor());
+                    if (delta <= 0) {
                         grains[x][y].setId(newId);
                         grains[x][y].setColor(colorForEveryId.get(grains[x][y].getId()));
-//                    System.out.println("NEW:" + grains[x][y].getColor());
                     }
 
                 }
 
             }
-//            System.out.println(g);;
-//            System.out.println(loc.size());
-//            loc.clear();
-//            System.out.println("DONE");
         }
-//        System.out.println(colorForEveryId);
-//        for (int i = 0; i < gridWidth; i++) {
-//            for (int j = 0; j < gridHeight; j++) {
-//                System.out.println(grains[i][j].getColor());
-//                grains[i][j].setColor(colorForEveryId.get(grains[x][y].getId()));
-//                System.out.println(grains[i][j].getColor());
-//            }
-//        }
         setBoundaries();
     }
 
+    public void setGrainsToDualPhase(int x, int y) {
+        int id = grains[x][y].getId();
+        boolean state;
+        if (grains[x][y].isDualPhase()) {
+            state = false;
+        } else {
+            state = true;
+        }
+        grains[x][y].setDualPhase(state);
+        for (int i = 0; i < gridWidth; i++) {
+            for (int j = 0; j < gridHeight; j++) {
+                if (grains[i][j].getId() == id) {
+                    grains[i][j].setDualPhase(state);
+                }
+            }
+        }
+    }
+
+    public void setEnergyEvenly(double energy, double noise) {
+        for (int i = 0; i < gridWidth; i++) {
+            for (int j = 0; j < gridHeight; j++) {
+                double randNoise = random.nextInt() - noise;
+                grains[i][j].setEnergy(energy + randNoise);
+            }
+        }
+    }
+
+    public void setEnergyWithBorders(double energy, double noise, double energyOnBorder) {
+        for (int i = 0; i < gridWidth; i++) {
+            for (int j = 0; j < gridHeight; j++) {
+                Grain grain = grains[i][j];
+
+                if (grain.isOnBorder()) {
+                    grain.setEnergy(energyOnBorder);
+                } else {
+                    double randNoise;
+                    if(random.nextBoolean() == false) {
+                        randNoise = -noise;
+                    } else {
+                        randNoise = noise;
+                    }
+//                    double randNoise = random.ne() - noise;
+                    grain.setEnergy(energy + randNoise);
+                }
+            }
+        }
+    }
 
 }
 

@@ -5,9 +5,8 @@ import javafx.fxml.FXML;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -15,6 +14,7 @@ import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
+import model.Grain;
 import model.Growth;
 import model.Main;
 
@@ -74,7 +74,6 @@ public class Controller {
     @FXML
     Label GBLabel;
 
-
     //  ---------------------------
     @FXML
     TextField numberOfStateTextFiled;
@@ -84,6 +83,18 @@ public class Controller {
 
     @FXML
     TextField iterationsTextField;
+
+    @FXML
+    TextField energyOnBorderTextField;
+
+    @FXML
+    TextField energyTextField;
+
+    @FXML
+    TextField noiseTextField;
+
+    @FXML
+    ToggleButton showEnergyToggle;
 
     @FXML
     void initialize() {
@@ -114,12 +125,6 @@ public class Controller {
                 isgridCreated = true;
 
             }
-
-//            for (int i = 0; i < growthModel.getWidth(); i++) {
-//                for (int j = 0; j < growthModel.getHeight(); j++) {
-//                    System.out.println(growthModel.getGrain(i,j).getState());
-//                }
-//            }
         }
 
         growthModel.randColorForEveryId(Integer.parseInt(numberOfGrainsField.getText()));
@@ -408,6 +413,12 @@ public class Controller {
                     } else {
                         graphicsContext.setFill(growthModel.getGrain(i, j).getColor());
                     }
+
+                    if (growthModel.getGrain(i, j).isDualPhase()) {
+                        graphicsContext.setFill(javafx.scene.paint.Color.RED);
+                    } else {
+                        graphicsContext.setFill(growthModel.getGrain(i, j).getColor());
+                    }
                     graphicsContext.fillRect(i * grainWidth, j * grainHeight, grainWidth, grainHeight);
                 }
             }
@@ -429,6 +440,7 @@ public class Controller {
         int y = (int) mouseEvent.getSceneY() - 25;
         String phase = phaseChoiceBox.getValue().toString();
         growthModel.selectGrain(x, y, phase);
+        growthModel.setGrainsToDualPhase(x, y);
     }
 
     @FXML
@@ -484,7 +496,6 @@ public class Controller {
         GBLabel.setText("" + df2.format(boundarySize / holeSize));
     }
 
-
     @FXML
     public void showSelectedBoundaryAction() {
         int size = Integer.parseInt(boundarySizeTextField.getText());
@@ -523,7 +534,6 @@ public class Controller {
             }
         }
     }
-
 
     @FXML
     public void regrowthAction() {
@@ -571,8 +581,9 @@ public class Controller {
 
 
     // ************* Monte Carlo *****************
+
     @FXML
-    public void monteCarloGrowthAction() {
+    public void fillMonteCarloGrains() {
         int width = Integer.parseInt(widthField.getText());
         int height = Integer.parseInt(heightField.getText());
 
@@ -585,19 +596,71 @@ public class Controller {
 
         growthModel.fillSpaceWithGrains(Integer.parseInt(numberOfStateTextFiled.getText()));
 
-        growthModel.MonteCarloGrowth(
-                Integer.parseInt(iterationsTextField.getText()),
-                Double.parseDouble(constantTextField.getText()));
-
         showGrid();
     }
 
-    public void OnePeriodAction() {
+    @FXML
+    public void monteCarloGrowthAction() {
+
+        growthModel.fillSpaceWithGrains(Integer.parseInt(numberOfStateTextFiled.getText()));
+
         growthModel.MonteCarloGrowth(
                 Integer.parseInt(iterationsTextField.getText()),
                 Double.parseDouble(constantTextField.getText()));
-
+        isgridCreated = true;
         showGrid();
+    }
+
+    @FXML
+    public void showMonteCarloDualPhase() {
+        graphicsContext.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        for (int i = 0; i < growthModel.getWidth(); i++) {
+            for (int j = 0; j < growthModel.getHeight(); j++) {
+                if (growthModel.getGrain(i, j).isDualPhase()) {
+                    graphicsContext.setFill(javafx.scene.paint.Color.RED);
+                    graphicsContext.fillRect(i * grainWidth, j * grainHeight, grainWidth, grainHeight);
+                } else {
+                    growthModel.clearGrain(i, j);
+                }
+            }
+        }
+    }
+
+    @FXML
+    public void showEnergyAction() {
+        double energy = Double.parseDouble(energyTextField.getText());
+        double noise = Double.parseDouble(noiseTextField.getText());
+        double energyOnBorder = Double.parseDouble(energyOnBorderTextField.getText());
+        double minEnergy = energy - noise;
+        double maxEnergy = energy + noise;
+
+        growthModel.setEnergyWithBorders(energy, noise, energyOnBorder);
+
+
+        graphicsContext.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+
+        if (showEnergyToggle.isSelected()) {
+            for (int i = 0; i < growthModel.getWidth(); i++) {
+                for (int j = 0; j < growthModel.getHeight(); j++) {
+                    Grain grain = growthModel.getGrain(i, j);
+
+                    if (grain.isOnBorder()) {
+                        graphicsContext.setFill(javafx.scene.paint.Color.YELLOW);
+                        graphicsContext.fillRect(i * grainWidth, j * grainHeight, grainWidth, grainHeight);
+                        continue;
+                    }
+
+
+                    int color = (int) (  ((grain.getEnergy() - minEnergy) * (255 - 200) ) / (maxEnergy - minEnergy)) + 200;
+                    System.out.println(color);
+                    graphicsContext.setFill(javafx.scene.paint.Color.rgb(0, 0, color));
+                    graphicsContext.fillRect(i * grainWidth, j * grainHeight, grainWidth, grainHeight);
+                }
+            }
+        } else {
+            showGrid();
+        }
+
     }
 }
 
