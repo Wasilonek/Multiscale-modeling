@@ -3,6 +3,9 @@ package model;
 import javafx.scene.paint.Color;
 
 public class Grain {
+    private int _ID;
+    private int x;
+    private int y;
     private int id;
     private int state;
     private int nextState;
@@ -12,8 +15,10 @@ public class Grain {
     private boolean isGrainSelected;
     private boolean frozen;
 
-
     public Grain() {
+        x = -1;
+        y = -1;
+        _ID = -1;
         state = nextState = 0;
         id = -1;
         color = null;
@@ -85,5 +90,29 @@ public class Grain {
 
     public void setFrozen(boolean frozen) {
         this.frozen = frozen;
+    }
+
+    public int get_ID() {
+        return _ID;
+    }
+
+    public void set_ID(int _ID) {
+        this._ID = _ID;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public void setY(int y) {
+        this.y = y;
     }
 }

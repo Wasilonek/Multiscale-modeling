@@ -34,6 +34,11 @@ public class Growth {
     public List selectedPhaseIds;
     public List selectedDualIds;
 
+//    ******************** Monte Carlo ****************
+    public List monteCarloGrainsList;
+    public List monteCarloCounters;
+
+
     public Growth() {
         colorMap = colorForEveryId = new HashMap<>();
         grainMap = new HashMap<>();
@@ -42,6 +47,8 @@ public class Growth {
         selectedGrainsIds = new ArrayList();
         selectedPhaseIds = new ArrayList();
         selectedDualIds = new ArrayList();
+        monteCarloGrainsList = new ArrayList();
+        monteCarloCounters = new ArrayList<>();
     }
 
     public void createGrid(int canvasWidth, int canvasHeight) {
@@ -66,6 +73,7 @@ public class Growth {
     public void randomGrains(int numberOfGrains) {
         Random random = new Random();
 
+        int counter = 0;
         int x, y;
         int maxAttemptToRandomGrains = 0;
 
@@ -85,6 +93,10 @@ public class Growth {
                 maxAttemptToRandomGrains++;
                 continue;
             }
+            counter++;
+            grains[x][y].setX(x);
+            grains[x][y].setY(y);
+            grains[x][y].set_ID(counter);
             grains[x][y].setState(1);
             grains[x][y].setId(i);
             grains[x][y].setColor(colorForEveryId.get(grains[x][y].getId()));
@@ -643,6 +655,9 @@ public class Growth {
     public void clearArray() {
         for (int i = 0; i < gridWidth; i++) {
             for (int j = 0; j < gridHeight; j++) {
+                grains[i][j].setX(-1);
+                grains[i][j].setY(-1);
+                grains[i][j].set_ID(-1);
                 grains[i][j].setState(0);
                 grains[i][j].setNextState(0);
                 grains[i][j].setColor(Color.WHITE);
@@ -661,6 +676,9 @@ public class Growth {
     }
 
     public void clearGrain(int i, int j) {
+        grains[i][j].setX(-1);
+        grains[i][j].setY(-1);
+        grains[i][j].set_ID(-1);
         grains[i][j].setState(0);
         grains[i][j].setNextState(0);
         grains[i][j].setColor(Color.WHITE);
@@ -895,6 +913,9 @@ public class Growth {
         for (int i = 0; i < gridWidth; i++) {
             for (int j = 0; j < gridHeight; j++) {
                 if (!grains[i][j].isGrainSelected()) {
+                    grains[i][j].setX(-1);
+                    grains[i][j].setY(-1);
+                    grains[i][j].set_ID(-1);
                     grains[i][j].setState(0);
                     grains[i][j].setNextState(0);
                     grains[i][j].setColor(Color.WHITE);
@@ -910,6 +931,221 @@ public class Growth {
         isArrayFull = false;
 //        selectedGrainsIds.clear();
     }
+
+
+
+    public void fillSpaceWithGrains(int numberOfStates) {
+        monteCarloCounters.clear();
+        monteCarloGrainsList.clear();
+        int counter = 0;
+
+        for (int i = 0; i < gridWidth; i++) {
+            for (int j = 0; j < gridHeight; j++) {
+                if(grains[i][j].isFrozen() || grains[i][j].isGrainSelected() || selectedDualIds.contains(grains[i][j].getId())) {
+                    System.out.println(counter++);;
+                }
+            }
+        }
+
+        for (int i = 0; i < gridWidth; i++) {
+            for (int j = 0; j < gridHeight; j++) {
+                int id = random.nextInt(numberOfStates);
+                if(grains[i][j].isFrozen() || selectedDualIds.contains(grains[i][j].getId())) {
+                    continue;
+                }
+
+                grains[i][j].setX(i);
+                grains[i][j].setY(j);
+                grains[i][j].setState(1);
+                grains[i][j].setId(id);
+                grains[i][j].setColor(colorForEveryId.get(grains[i][j].getId()));
+                grains[i][j].set_ID(counter);
+                monteCarloGrainsList.add(grains[i][j]);
+                monteCarloCounters.add(counter++);
+
+            }
+        }
+    }
+
+
+
+
+    private List switchItem(List list,int from,int to) {
+//        Grain temp = (Grain) list.get(from);
+        int temp = (int) list.get(from);
+
+        list.set(from,list.get(to));
+        list.set(to,temp);
+        return list;
+    }
+
+    private void getRandomUniqueValues() {
+        for(var i = 0; i < monteCarloCounters.size(); i++) {
+            int randomPosition = (int) Math.floor(Math.random() * Math.floor(monteCarloCounters.size() - i -1));
+//            System.out.println(monteCarloGrainsList.get(randomPosition));
+            monteCarloCounters = switchItem(monteCarloCounters,randomPosition,monteCarloCounters.size() - 1 - i);
+        }
+    }
+
+
+
+    public void MonteCarloGrowth(int numberOfIterations, double constant) {
+        List copy = new ArrayList(monteCarloCounters);
+        List localNeighboursIds =  new ArrayList();
+        Set loc = new HashSet();
+        List used = new ArrayList();
+
+        int x = -1;
+        int y = -1;
+
+//        Set hSet = new HashSet<>(monteCarloGrainsList);
+//        System.out.println(hSet.size());
+
+
+        for (int k = 0; k < numberOfIterations; k++) {
+            System.out.println(k);
+            monteCarloCounters = new ArrayList(copy);
+            getRandomUniqueValues();
+            int g;
+            for(g = 0; g < monteCarloCounters.size(); g++) {
+//                System.out.println(g);
+                localNeighboursIds.clear();
+
+//                if(monteCarloGrainsList.size() == 0) {
+//                    break;
+//                }
+
+                Grain grain = (Grain) monteCarloGrainsList.get((Integer) monteCarloCounters.get(g));
+                if(grain.isGrainSelected() || selectedDualIds.contains(grain.getId())) {
+                    System.out.println(grain.getId());
+                    continue;
+                }
+//                Object key;
+//                do{
+//                Object[] Keys = monteCarloGrainsMap.keySet().toArray();
+//                key = Keys[new Random().nextInt(Keys.length)];
+//                if(!used.contains(key)) {
+//                    break;
+//                }}while (true);
+//                grain = monteCarloGrainsMap.get(key);
+
+                x = grain.getX();
+                y = grain.getY();
+//                monteCarloGrainsMap.remove(key);
+
+                setEdge(x, y);
+
+
+                if (grains[indUp][indLeft].getId() != grains[x][y].getId()) {
+                    localNeighboursIds.add(grains[indUp][indLeft].getId());
+                }
+
+                if (grains[indUp][y].getId() != grains[x][y].getId()) {
+                    localNeighboursIds.add(grains[indUp][y].getId());
+                }
+
+                if (grains[indUp][indRight].getId() != grains[x][y].getId()) {
+                    localNeighboursIds.add(grains[indUp][indRight].getId());
+                }
+
+                if (grains[x][indLeft].getId() != grains[x][y].getId()) {
+                    localNeighboursIds.add(grains[x][indRight].getId());
+                }
+
+                if (grains[x][indRight].getId() != grains[x][y].getId()) {
+                    localNeighboursIds.add(grains[x][indRight].getId());
+                }
+
+                if (grains[indDown][indLeft].getId() != grains[x][y].getId()) {
+                    localNeighboursIds.add(grains[indDown][indLeft].getId());
+                }
+
+                if (grains[indDown][y].getId() != grains[x][y].getId()) {
+                    localNeighboursIds.add(grains[indDown][y].getId());
+                }
+
+                if (grains[indDown][indRight].getId() != grains[x][y].getId()) {
+                    localNeighboursIds.add(grains[indDown][indRight].getId());
+                }
+
+
+
+
+
+                double oldEnergy = constant * localNeighboursIds.size();
+
+                if(localNeighboursIds.size() != 0) {
+
+                    int newId = (int) localNeighboursIds.get(random.nextInt(localNeighboursIds.size()));
+
+
+
+
+
+
+                    localNeighboursIds.clear();
+                    if (grains[indUp][indLeft].getId() != newId) {
+                        localNeighboursIds.add(grains[indUp][indLeft].getId());
+                    }
+
+                    if (grains[indUp][y].getId() != newId) {
+                        localNeighboursIds.add(grains[indUp][y].getId());
+                    }
+
+                    if (grains[indUp][indRight].getId() != newId) {
+                        localNeighboursIds.add(grains[indUp][indRight].getId());
+                    }
+
+                    if (grains[x][indLeft].getId() != newId) {
+                        localNeighboursIds.add(grains[x][indRight].getId());
+                    }
+
+                    if (grains[x][indRight].getId() != newId) {
+                        localNeighboursIds.add(grains[x][indRight].getId());
+                    }
+
+                    if (grains[indDown][indLeft].getId() != newId) {
+                        localNeighboursIds.add(grains[indDown][indLeft].getId());
+                    }
+
+                    if (grains[indDown][y].getId() != newId) {
+                        localNeighboursIds.add(grains[indDown][y].getId());
+                    }
+
+                    if (grains[indDown][indRight].getId() != newId) {
+                        localNeighboursIds.add(grains[indDown][indRight].getId());
+                    }
+
+                    double newEnergy = constant * localNeighboursIds.size();
+                    double delta = newEnergy - oldEnergy;
+
+                    if(delta <= 0) {
+//                    System.out.println("OLD:" + grains[x][y].getColor());
+                        grains[x][y].setId(newId);
+                        grains[x][y].setColor(colorForEveryId.get(grains[x][y].getId()));
+//                    System.out.println("NEW:" + grains[x][y].getColor());
+                    }
+
+                }
+
+            }
+//            System.out.println(g);;
+//            System.out.println(loc.size());
+//            loc.clear();
+//            System.out.println("DONE");
+        }
+//        System.out.println(colorForEveryId);
+//        for (int i = 0; i < gridWidth; i++) {
+//            for (int j = 0; j < gridHeight; j++) {
+//                System.out.println(grains[i][j].getColor());
+//                grains[i][j].setColor(colorForEveryId.get(grains[x][y].getId()));
+//                System.out.println(grains[i][j].getColor());
+//            }
+//        }
+        setBoundaries();
+    }
+
+
 }
 
 

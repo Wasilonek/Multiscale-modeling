@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
@@ -73,6 +74,17 @@ public class Controller {
     @FXML
     Label GBLabel;
 
+
+    //  ---------------------------
+    @FXML
+    TextField numberOfStateTextFiled;
+
+    @FXML
+    TextField constantTextField;
+
+    @FXML
+    TextField iterationsTextField;
+
     @FXML
     void initialize() {
         growthModel = new Growth();
@@ -82,8 +94,7 @@ public class Controller {
         inclusionTypeChoiceBox.setValue("Square");
 
         phaseChoiceBox.setItems(FXCollections.observableArrayList("Substructure", "Dual phase"));
-        phaseChoiceBox.setValue("Substructure");
-
+        phaseChoiceBox.setValue("Dual phase");
     }
 
     public void setGrains() {
@@ -96,9 +107,9 @@ public class Controller {
             canvas.setHeight(height);
 
 
-            if(isLoadedFromFile){
+            if (isLoadedFromFile) {
                 isLoadedFromFile = false;
-            }else {
+            } else {
                 growthModel.createGrid((int) canvas.getWidth() / grainWidth, (int) canvas.getHeight() / grainHeight);
                 isgridCreated = true;
 
@@ -368,9 +379,9 @@ public class Controller {
                     javafx.scene.paint.Color fxColor = growthModel.getGrain(i, j).getColor();
 
 
-                        java.awt.Color awtColor = new java.awt.Color(1,1,1,1);
-                        graphic.setColor(new java.awt.Color(255,255,255));
-                        graphic.fillRect(i * grainWidth, j * grainHeight, grainWidth, grainHeight);
+                    java.awt.Color awtColor = new java.awt.Color(1, 1, 1, 1);
+                    graphic.setColor(new java.awt.Color(255, 255, 255));
+                    graphic.fillRect(i * grainWidth, j * grainHeight, grainWidth, grainHeight);
 
                 }
             }
@@ -417,7 +428,7 @@ public class Controller {
         int x = (int) mouseEvent.getSceneX();
         int y = (int) mouseEvent.getSceneY() - 25;
         String phase = phaseChoiceBox.getValue().toString();
-        growthModel.selectGrain(x, y, phase );
+        growthModel.selectGrain(x, y, phase);
     }
 
     @FXML
@@ -470,7 +481,7 @@ public class Controller {
             }
         }
         DecimalFormat df2 = new DecimalFormat("#.##");
-        GBLabel.setText("" + df2.format(boundarySize/holeSize));
+        GBLabel.setText("" + df2.format(boundarySize / holeSize));
     }
 
 
@@ -556,6 +567,37 @@ public class Controller {
             }
         }
 
+    }
+
+
+    // ************* Monte Carlo *****************
+    @FXML
+    public void monteCarloGrowthAction() {
+        int width = Integer.parseInt(widthField.getText());
+        int height = Integer.parseInt(heightField.getText());
+
+        canvas.setWidth(width);
+        canvas.setHeight(height);
+
+        growthModel.createGrid((int) canvas.getWidth() / grainWidth, (int) canvas.getHeight() / grainHeight);
+
+        growthModel.randColorForEveryId(Integer.parseInt(numberOfStateTextFiled.getText()));
+
+        growthModel.fillSpaceWithGrains(Integer.parseInt(numberOfStateTextFiled.getText()));
+
+        growthModel.MonteCarloGrowth(
+                Integer.parseInt(iterationsTextField.getText()),
+                Double.parseDouble(constantTextField.getText()));
+
+        showGrid();
+    }
+
+    public void OnePeriodAction() {
+        growthModel.MonteCarloGrowth(
+                Integer.parseInt(iterationsTextField.getText()),
+                Double.parseDouble(constantTextField.getText()));
+
+        showGrid();
     }
 }
 
